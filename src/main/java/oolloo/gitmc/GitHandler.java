@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.FetchResult;
+import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.TrackingRefUpdate;
 
 import javax.annotation.Nullable;
@@ -259,7 +260,19 @@ public class GitHandler {
 
         return response;
     }
-    
+    public CmdResponse push(){
+        try {
+            CmdResponse response = new CmdResponse();
+            Iterable<PushResult> result = git.push().setTransportConfigCallback(SshHandler.getTransferConfigCallback()).call();
+            result.forEach((r)->{
+                response.append(r.getMessages()+"\n");
+            });
+            return response;
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+            return new CmdResponse(e);
+        }
+    }
     private List<String> limit(List<String> in, int limit){
         if (in.size()>limit){
             List<String> out = in.stream().limit(limit).collect(Collectors.toList());
@@ -269,14 +282,14 @@ public class GitHandler {
             return in;
         }
     }
-    private Pattern getPattern(String path){
-        if (path.equals("."))
-            return Pattern.compile("^.*$");
-        path = path.replace(".","\\.");
-        path = path.replace("^","\\^");
-        path = path.replace("$","\\$");
-        path = path.replace("*",".*");
-        path = path.replace("?",".?");
-        return Pattern.compile("^"+path+"$");
-    }
+//    private Pattern getPattern(String path){
+//        if (path.equals("."))
+//            return Pattern.compile("^.*$");
+//        path = path.replace(".","\\.");
+//        path = path.replace("^","\\^");
+//        path = path.replace("$","\\$");
+//        path = path.replace("*",".*");
+//        path = path.replace("?",".?");
+//        return Pattern.compile("^"+path+"$");
+//    }
 }

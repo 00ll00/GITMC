@@ -43,11 +43,12 @@ public class GitCommand {
                                 .then(Commands.argument("path",StringArgumentType.greedyString()).executes((Context) -> gitCheckout(Context.getSource(),StringArgumentType.getString(Context,"branch"),StringArgumentType.getString(Context,"path"))))
                         )
                 )
+                .then(Commands.literal("push").executes((Context) -> gitPush(Context.getSource())))
         );
     }
 
     public static int gitHelp(CommandSource source){
-        source.sendFeedback(new StringTextComponent("DONT USE GIT COMMANDS except search/bind/pull/status"),false);
+        source.sendFeedback(new StringTextComponent("version 0.2"),false);
         return 1;
     }
     public static int gitSearch(CommandSource source){
@@ -129,6 +130,15 @@ public class GitCommand {
     }
     public static int gitCheckout(CommandSource source,String branch,@Nullable String path){
         CmdResponse response = gitHandler.checkout(branch,path);
+        if(response.isSucceed()) {
+            source.sendFeedback(response.getComponent(), true);
+        }else {
+            source.sendErrorMessage(response.getComponent());
+        }
+        return response.getValue();
+    }
+    public static int gitPush(CommandSource source){
+        CmdResponse response = gitHandler.push();
         if(response.isSucceed()) {
             source.sendFeedback(response.getComponent(), true);
         }else {
