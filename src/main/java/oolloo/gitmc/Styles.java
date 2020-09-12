@@ -28,6 +28,8 @@ public final class Styles {
     public static final Style STATUS_MODIFIED = style(codeColor("#6efafa"),false,false,false,false,false,null,null,null,null);
     public static final Style STATUS_UNTRACKED = style(codeColor("#6efa6e"),false,false,false,false,false,null,null,null,null);
     public static final Style STATUS_MISSING = style(codeColor("#fb6e6e"),false,false,false,false,false,null,null,null,null);
+    public static final Style STATUS_UNDELETED = style(codeColor("#a6a656"),false,false,false,false,false,null,null,null,null);
+    public static final Style STATUS_CONFLICTED = style(codeColor("#fafa6e"),false,false,false,false,false,null,null,null,null);
 
     public static Style style(@Nullable Color color,@Nullable Boolean bold,@Nullable Boolean italic,@Nullable Boolean underlined,@Nullable Boolean strikethrough,@Nullable Boolean obfuscated,@Nullable ClickEvent clickEvent,@Nullable HoverEvent hoverEvent,@Nullable String insertion,@Nullable ResourceLocation location){
         return Style.field_240709_b_.func_240718_a_(color)

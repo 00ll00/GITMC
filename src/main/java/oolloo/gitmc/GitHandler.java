@@ -250,12 +250,12 @@ public class GitHandler {
         files=result.getConflictList();
         if (files!=null && !files.isEmpty()) {
             response.append("\n").append(files.size()).append(" file(s) conflicted:\n    ");
-            response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_MODIFIED);
+            response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_CONFLICTED);
         }
         files=result.getUndeletedList();
         if (files!=null && !files.isEmpty()) {
             response.append("\n").append(files.size()).append(" file(s) undeleted:\n    ");
-            response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_MODIFIED);
+            response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_UNDELETED);
         }
 
         return response;
