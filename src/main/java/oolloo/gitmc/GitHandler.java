@@ -158,29 +158,35 @@ public class GitHandler {
                 Set<String> files;
                 response.append("Repo ").append(repoName,Styles.REPO).append(" : On branch ").append(git.getRepository().getBranch(),Styles.BRANCH);
                 files=status.getChanged();
-                if (!files.isEmpty())
+                if (!files.isEmpty()) {
                     response.append("\n").append(files.size()).append(" file(s) changed:\n    ");
-                    response.append(String.join("\n    ",limit(new ArrayList<>(files),10)),Styles.STATUS_CHANGED);
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_CHANGED);
+                }
                 files=status.getAdded();
-                if (!files.isEmpty())
+                if (!files.isEmpty()) {
                     response.append("\n").append(files.size()).append(" file(s) added:\n    ");
-                    response.append(String.join("\n    ",limit(new ArrayList<>(files), 10)),Styles.STATUS_ADDED);
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_ADDED);
+                }
                 files=status.getRemoved();
-                if (!files.isEmpty())
+                if (!files.isEmpty()) {
                     response.append("\n").append(files.size()).append(" file(s) removed:\n    ");
-                    response.append(String.join("\n    ",limit(new ArrayList<>(files),10)),Styles.STATUS_REMOVED);
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_REMOVED);
+                }
                 files=status.getModified();
-                if (!files.isEmpty())
+                if (!files.isEmpty()) {
                     response.append("\n").append(files.size()).append(" file(s) modified:\n    ");
-                    response.append(String.join("\n    ",limit(new ArrayList<>(files),10)),Styles.STATUS_MODIFIED);
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_MODIFIED);
+                }
                 files=status.getUntracked();
-                if (!files.isEmpty())
+                if (!files.isEmpty()) {
                     response.append("\n").append(files.size()).append(" file(s) untracked:\n    ");
-                    response.append(String.join("\n    ",limit(new ArrayList<>(files),10)),Styles.STATUS_UNTRACKED);
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_UNTRACKED);
+                }
                 files=status.getMissing();
-                if (!files.isEmpty())
+                if (!files.isEmpty()) {
                     response.append("\n").append(files.size()).append(" file(s) missing:\n    ");
-                    response.append(String.join("\n    ",limit(new ArrayList<>(files),10)),Styles.STATUS_MISSING);
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_MISSING);
+                }
                 return response.setValue(0);
             }
 
