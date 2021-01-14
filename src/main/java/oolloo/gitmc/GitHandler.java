@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.PushResult;
@@ -140,7 +141,7 @@ public class GitHandler {
         if (repo == null || !repo.exists()) return ERROR_REPO_NOT_EXIST;
         try {
             RevCommit revCommit = git.commit().setMessage(message).call();
-            return new CmdResponse("commit test");
+            return new CmdResponse(revCommit.toString());
         } catch (GitAPIException e) {
             e.printStackTrace();
             return new CmdResponse(e);
@@ -204,7 +205,7 @@ public class GitHandler {
             try {
                 for(Ref ref : refMap.values()){
                     String name = ref.getName();
-                    if(name.equals("HEAD") || name.endsWith(git.getRepository().getFullBranch())){
+                    if(name.equals("HEAD") || name.equals(git.getRepository().getFullBranch())){
                         response.append("\n  * ");
                     }else {
                         response.append("\n    ");
