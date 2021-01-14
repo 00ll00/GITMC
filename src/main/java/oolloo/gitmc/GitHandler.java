@@ -1,5 +1,7 @@
 package oolloo.gitmc;
 
+import net.minecraft.command.CommandSource;
+import net.minecraft.util.text.StringTextComponent;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -26,9 +28,13 @@ public class GitHandler {
     private static final Map<String,Ref> refMap=new HashMap<>();
 
     private static final CmdResponse ERROR_REPO_NOT_EXIST = new CmdResponse("Repository not exist. Use command 'git bind <repo>' to bind a repository.",Styles.ERROR).setValue(0);
+    private static final CmdResponse ERROR_GIT_HANDLER_BUSY = new CmdResponse("A git command is handling, plz wait.",Styles.ERROR).setValue(0);
+
+    static Boolean busy;
 
     public GitHandler(){
         search();
+        busy=false;
     }
 
     public Set<String> getReposKey(){
@@ -87,21 +93,13 @@ public class GitHandler {
         }
     }
 
-    public CmdResponse pull() {
+    public CmdResponse pull(CommandSource source) {
+        if (busy) return ERROR_GIT_HANDLER_BUSY;
         if (repo == null || !repo.exists()) return ERROR_REPO_NOT_EXIST;
-        try {
-            git=Git.open(repo);
-            PullCommand pull = git.pull().setTransportConfigCallback(SshHandler.getTransferConfigCallback());
-            PullResult result = pull.call();
-            if(result.isSuccessful()){
-                return new CmdResponse(result.toString());
-            }else {
-                return new CmdResponse(result.toString(),0);
-            }
-        } catch (GitAPIException | IOException e) {
-            e.printStackTrace();
-            return new CmdResponse(e);
-        }
+        TrPull tr = new TrPull();
+        tr.setSource(source);
+        new Thread(tr).start();
+        return new CmdResponse("Git pull started.");
     }
     public CmdResponse fetch(){
         if (repo == null || !repo.exists()) return ERROR_REPO_NOT_EXIST;
@@ -289,14 +287,31 @@ public class GitHandler {
             return in;
         }
     }
-//    private Pattern getPattern(String path){
-//        if (path.equals("."))
-//            return Pattern.compile("^.*$");
-//        path = path.replace(".","\\.");
-//        path = path.replace("^","\\^");
-//        path = path.replace("$","\\$");
-//        path = path.replace("*",".*");
-//        path = path.replace("?",".?");
-//        return Pattern.compile("^"+path+"$");
-//    }
+
+    static class TrPull implements Runnable {
+        private CommandSource source;
+
+        public void setSource(CommandSource source) {
+            this.source = source;
+        }
+
+        public void run() {
+            try {
+                GitHandler.busy = true;
+                git=Git.open(repo);
+                PullCommand pull = git.pull().setTransportConfigCallback(SshHandler.getTransferConfigCallback());
+                PullResult result = pull.call();
+                if(result.isSuccessful()){
+                    source.sendFeedback(new StringTextComponent(result.toString()),true);
+                }else {
+                    source.sendErrorMessage(new StringTextComponent(result.toString()));
+                }
+            } catch (Exception e) {
+                source.sendErrorMessage(new CmdResponse(e).getComponent());
+                e.printStackTrace();
+            } finally {
+                GitHandler.busy = false;
+            }
+        }
+    }
 }

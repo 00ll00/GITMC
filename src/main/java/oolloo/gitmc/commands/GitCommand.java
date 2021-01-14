@@ -48,7 +48,7 @@ public class GitCommand {
     }
 
     public static int gitHelp(CommandSource source){
-        source.sendFeedback(new StringTextComponent("version 0.2"),false);
+        source.sendFeedback(new StringTextComponent("version 0.3"),false);
         return 1;
     }
     public static int gitSearch(CommandSource source){
@@ -75,7 +75,7 @@ public class GitCommand {
         return response.getValue();
     }
     public static int gitPull(CommandSource source) {
-        CmdResponse response = gitHandler.pull();
+        CmdResponse response = gitHandler.pull(source);
         if(response.isSucceed()) {
             source.sendFeedback(response.getComponent(), true);
         }else {
