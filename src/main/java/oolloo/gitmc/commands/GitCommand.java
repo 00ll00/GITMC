@@ -102,7 +102,7 @@ public class GitCommand {
         return response.getValue();
     }
     public static int gitFetch(CommandSource source){
-        CmdResponse response = gitHandler.fetch();
+        CmdResponse response = gitHandler.fetch(source);
         if(response.isSucceed()) {
             source.sendFeedback(response.getComponent(), true);
         }else {
@@ -129,7 +129,7 @@ public class GitCommand {
         return response.getValue();
     }
     public static int gitCheckout(CommandSource source,String branch,@Nullable String path){
-        CmdResponse response = gitHandler.checkout(branch,path);
+        CmdResponse response = gitHandler.checkout(source, branch, path);
         if(response.isSucceed()) {
             source.sendFeedback(response.getComponent(), true);
         }else {
@@ -138,7 +138,7 @@ public class GitCommand {
         return response.getValue();
     }
     public static int gitPush(CommandSource source){
-        CmdResponse response = gitHandler.push();
+        CmdResponse response = gitHandler.push(source);
         if(response.isSucceed()) {
             source.sendFeedback(response.getComponent(), true);
         }else {

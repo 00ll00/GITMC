@@ -8,11 +8,9 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.PushResult;
@@ -101,28 +99,13 @@ public class GitHandler {
         new Thread(tr).start();
         return new CmdResponse("Git pull started.");
     }
-    public CmdResponse fetch(){
+    public CmdResponse fetch(CommandSource source){
+        if (busy) return ERROR_GIT_HANDLER_BUSY;
         if (repo == null || !repo.exists()) return ERROR_REPO_NOT_EXIST;
-        try {
-            git=Git.open(repo);
-            FetchCommand fetch = git.fetch().setTransportConfigCallback(SshHandler.getTransferConfigCallback());
-            FetchResult result = fetch.call();
-            Collection<TrackingRefUpdate> refUpdates = result.getTrackingRefUpdates();
-            CmdResponse response = new CmdResponse();
-            if (refUpdates.size()>0){
-                response.append("From ").append(result.getURI().toString(),Styles.URL);
-                for(TrackingRefUpdate update:refUpdates){
-                    response.append("\n    ").append(update.getResult().toString()).append(update.getNewObjectId().getName()).append(update.getRemoteName(),Styles.REPO).append("    ->    ").append(update.getLocalName(),Styles.REPO);
-                }
-            }else {
-                response.append("Nothing need to fetch.");
-            }
-
-            return response;
-        } catch (IOException | GitAPIException e) {
-            e.printStackTrace();
-            return new CmdResponse(e);
-        }
+        TrFetch tr = new TrFetch();
+        tr.setSource(source);
+        new Thread(tr).start();
+        return new CmdResponse("Git fetch started.");
     }
     public CmdResponse add(String pattern){
         if (repo == null || !repo.exists()) return ERROR_REPO_NOT_EXIST;
@@ -225,60 +208,23 @@ public class GitHandler {
             }
         }
     }
-    public CmdResponse checkout(String branch,@Nullable String path){
-        CmdResponse response = new CmdResponse();
-        CheckoutCommand command = git.checkout().setCreateBranch(false).setName(branch);
-        if (path!=null && path!=""){
-            if (path.equals("."))
-                command.setAllPaths(true);
-            command.addPath(path);
-        }
-        try {
-            command.call();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-            return new CmdResponse(e);
-        }
-        CheckoutResult result = command.getResult();
-        response.append("Checkout "+result.getStatus().name());
-        List<String> files;
-        files=result.getModifiedList();
-        if (files!=null && !files.isEmpty()) {
-            response.append("\n").append(files.size()).append(" file(s) modified:\n    ");
-            response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_MODIFIED);
-        }
-        files=result.getRemovedList();
-        if (files!=null && !files.isEmpty()) {
-            response.append("\n").append(files.size()).append(" file(s) removed:\n    ");
-            response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_REMOVED);
-        }
-        files=result.getConflictList();
-        if (files!=null && !files.isEmpty()) {
-            response.append("\n").append(files.size()).append(" file(s) conflicted:\n    ");
-            response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_CONFLICTED);
-        }
-        files=result.getUndeletedList();
-        if (files!=null && !files.isEmpty()) {
-            response.append("\n").append(files.size()).append(" file(s) undeleted:\n    ");
-            response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_UNDELETED);
-        }
-
-        return response;
+    public CmdResponse checkout(CommandSource source, String branch, @Nullable String path){
+        if (busy) return ERROR_GIT_HANDLER_BUSY;
+        TrCheckOut tr = new TrCheckOut();
+        tr.setSource(source);
+        tr.setBranch(branch);
+        tr.setPath(path);
+        new Thread(tr).start();
+        return new CmdResponse("Git checkout started.");
     }
-    public CmdResponse push(){
-        try {
-            CmdResponse response = new CmdResponse();
-            Iterable<PushResult> result = git.push().setTransportConfigCallback(SshHandler.getTransferConfigCallback()).call();
-            result.forEach((r)->{
-                response.append(r.getMessages()+"\n");
-            });
-            return response;
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-            return new CmdResponse(e);
-        }
+    public CmdResponse push(CommandSource source){
+        if (busy) return ERROR_GIT_HANDLER_BUSY;
+        TrPush tr = new TrPush();
+        tr.setSource(source);
+        new Thread(tr).start();
+        return new CmdResponse("Git push started.");
     }
-    private List<String> limit(List<String> in, int limit){
+    private static List<String> limit(List<String> in, int limit){
         if (in.size()>limit){
             List<String> out = in.stream().limit(limit).collect(Collectors.toList());
             out.add("...");
@@ -290,11 +236,9 @@ public class GitHandler {
 
     static class TrPull implements Runnable {
         private CommandSource source;
-
         public void setSource(CommandSource source) {
             this.source = source;
         }
-
         public void run() {
             try {
                 GitHandler.busy = true;
@@ -306,6 +250,116 @@ public class GitHandler {
                 }else {
                     source.sendErrorMessage(new StringTextComponent(result.toString()));
                 }
+            } catch (Exception e) {
+                source.sendErrorMessage(new CmdResponse(e).getComponent());
+                e.printStackTrace();
+            } finally {
+                GitHandler.busy = false;
+            }
+        }
+    }
+    static class TrPush implements Runnable {
+        private CommandSource source;
+        public void setSource(CommandSource source) {
+            this.source = source;
+        }
+        public void run() {
+            try {
+                GitHandler.busy = true;
+                CmdResponse response = new CmdResponse();
+                Iterable<PushResult> result = git.push().setTransportConfigCallback(SshHandler.getTransferConfigCallback()).call();
+                result.forEach((r)->{
+                    response.append(r.getMessages()+"\n");
+                });
+                source.sendFeedback(response.getComponent(),true);
+            } catch (Exception e) {
+                source.sendErrorMessage(new CmdResponse(e).getComponent());
+                e.printStackTrace();
+            } finally {
+                GitHandler.busy = false;
+            }
+        }
+    }
+    static class TrFetch implements Runnable {
+        private CommandSource source;
+        public void setSource(CommandSource source) {
+            this.source = source;
+        }
+        public void run() {
+            try {
+                GitHandler.busy=true;
+                git=Git.open(repo);
+                FetchCommand fetch = git.fetch().setTransportConfigCallback(SshHandler.getTransferConfigCallback());
+                FetchResult result = fetch.call();
+                Collection<TrackingRefUpdate> refUpdates = result.getTrackingRefUpdates();
+                CmdResponse response = new CmdResponse();
+                if (refUpdates.size()>0){
+                    response.append("From ").append(result.getURI().toString(),Styles.URL);
+                    for(TrackingRefUpdate update:refUpdates){
+                        response.append("\n    ").append(update.getResult().toString()).append(update.getNewObjectId().getName()).append(update.getRemoteName(),Styles.REPO).append("    ->    ").append(update.getLocalName(),Styles.REPO);
+                    }
+                }else {
+                    response.append("Nothing need to fetch.");
+                }
+
+                source.sendFeedback(response.getComponent(),true);
+            } catch (Exception e) {
+                source.sendErrorMessage(new CmdResponse(e).getComponent());
+                e.printStackTrace();
+            } finally {
+                GitHandler.busy = false;
+            }
+        }
+    }
+    static class TrCheckOut implements Runnable {
+        private CommandSource source;
+        private String branch;
+        private String path;
+        public void setSource(CommandSource source) {
+            this.source = source;
+        }
+        public void setBranch(String branch) {
+            this.branch=branch;
+        }
+        public void setPath(String path) {
+            this.path = path;
+        }
+        public void run() {
+            try {
+                GitHandler.busy=true;
+                CmdResponse response = new CmdResponse();
+                CheckoutCommand command = git.checkout().setCreateBranch(false).setName(branch);
+                if (path!=null && !path.equals("")){
+                    if (path.equals("."))
+                        command.setAllPaths(true);
+                    command.addPath(path);
+                }
+                command.call();
+
+                CheckoutResult result = command.getResult();
+                response.append("Checkout "+result.getStatus().name());
+                List<String> files;
+                files=result.getModifiedList();
+                if (files!=null && !files.isEmpty()) {
+                    response.append("\n").append(files.size()).append(" file(s) modified:\n    ");
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_MODIFIED);
+                }
+                files=result.getRemovedList();
+                if (files!=null && !files.isEmpty()) {
+                    response.append("\n").append(files.size()).append(" file(s) removed:\n    ");
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_REMOVED);
+                }
+                files=result.getConflictList();
+                if (files!=null && !files.isEmpty()) {
+                    response.append("\n").append(files.size()).append(" file(s) conflicted:\n    ");
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_CONFLICTED);
+                }
+                files=result.getUndeletedList();
+                if (files!=null && !files.isEmpty()) {
+                    response.append("\n").append(files.size()).append(" file(s) undeleted:\n    ");
+                    response.append(String.join("\n    ", limit(new ArrayList<>(files), 10)), Styles.STATUS_UNDELETED);
+                }
+                source.sendFeedback(response.getComponent(),true);
             } catch (Exception e) {
                 source.sendErrorMessage(new CmdResponse(e).getComponent());
                 e.printStackTrace();

@@ -1,7 +1,6 @@
 package oolloo.gitmc;
 
 import com.jcraft.jsch.*;
-import com.mojang.serialization.codecs.PrimitiveCodec;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;

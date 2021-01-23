@@ -1,13 +1,9 @@
 package oolloo.gitmc;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Pattern;
 
 public class FileHelper {
     public static List<File> findFiles(String path,String name){
@@ -40,6 +36,27 @@ public class FileHelper {
             return Arrays.asList(files);
         }
         return null;
+    }
+
+
+    public static List<File> listDir(String path, boolean showFile, boolean showDir) {
+        List<File> fileList = new ArrayList<>();
+        File dir=new File(path);
+        if (dir.exists() && dir.isDirectory()) {
+            File[] list = dir.listFiles();
+            for (File file:list) {
+                if (showFile && file.isFile()) {
+                    fileList.add(file);
+                }
+                if (showDir && file.isDirectory()) {
+                    fileList.add(file);
+                }
+            }
+        }
+        return fileList;
+    }
+    public static List<File> listDir(String path, boolean showDir) {
+        return listDir(path,true,showDir);
     }
 
     public static String readText(File file) throws IOException {
