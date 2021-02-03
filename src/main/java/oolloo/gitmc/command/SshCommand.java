@@ -1,12 +1,12 @@
-package oolloo.gitmc.commands;
+package oolloo.gitmc.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import oolloo.gitmc.CmdResponse;
+import oolloo.gitmc.old.CmdResponse;
 import oolloo.gitmc.GITMC;
-import oolloo.gitmc.SshHandler;
+import oolloo.gitmc.old.SshHandler;
 
 public class SshCommand {
     private static final SshHandler sshHandler = GITMC.getSshHandler();

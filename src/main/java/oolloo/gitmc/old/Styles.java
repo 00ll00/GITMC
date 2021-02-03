@@ -1,4 +1,4 @@
-package oolloo.gitmc;
+package oolloo.gitmc.old;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.Color;

@@ -1,4 +1,4 @@
-package oolloo.gitmc;
+package oolloo.gitmc.old;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.text.StringTextComponent;
@@ -25,7 +25,7 @@ public class GitHandler {
     private static final Map<String,File> reposMap=new HashMap<>();
     private static final Map<String,Ref> refMap=new HashMap<>();
 
-    private static final CmdResponse ERROR_REPO_NOT_EXIST = new CmdResponse("Repository not exist. Use command 'git bind <repo>' to bind a repository.",Styles.ERROR).setValue(0);
+    private static final CmdResponse ERROR_REPO_NOT_EXIST = new CmdResponse("Repository not exist. Use command 'git bind <repo>' to bind a repository.", Styles.ERROR).setValue(0);
     private static final CmdResponse ERROR_GIT_HANDLER_BUSY = new CmdResponse("A git command is handling, plz wait.",Styles.ERROR).setValue(0);
 
     static Boolean busy;

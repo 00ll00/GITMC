@@ -5,8 +5,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import oolloo.gitmc.commands.GitCommand;
-import oolloo.gitmc.commands.SshCommand;
+import oolloo.gitmc.command.GitCommand;
+import oolloo.gitmc.command.SshCommand;
+import oolloo.gitmc.old.GitHandler;
+import oolloo.gitmc.old.SshHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -1,9 +1,10 @@
-package oolloo.gitmc;
+package oolloo.gitmc.old;
 
 import com.jcraft.jsch.*;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
+import oolloo.gitmc.GITMC;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.util.FS;
@@ -46,9 +47,9 @@ public class SshHandler {
         };
     }
 
-    public CmdResponse keyGen(String comment,boolean replace){
+    public CmdResponse keyGen(String comment, boolean replace){
         if(keyExist()&&!replace)
-            return new CmdResponse("SSH-Key already exist. Use command 'ssh keygen <comment> replace' to change the key anyway.",Styles.ERROR).setValue(0);
+            return new CmdResponse("SSH-Key already exist. Use command 'ssh keygen <comment> replace' to change the key anyway.", Styles.ERROR).setValue(0);
         JSch jSch =new JSch();
         try {
             KeyPair keyPair = KeyPair.genKeyPair(jSch,KeyPair.RSA);
