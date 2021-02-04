@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+
+import oolloo.gitmc.adapter.OptSugException;
 import org.kohsuke.args4j.spi.Getter;
 
 import org.kohsuke.args4j.spi.OptionHandler;
@@ -494,7 +496,7 @@ public class CmdLineParser {
 
                 if(currentOptionHandler==null) {
                     // TODO: insert dynamic handler processing
-                    throw new CmdLineException(this, Messages.UNDEFINED_OPTION, arg);
+                    throw new OptSugException(this, Messages.UNDEFINED_OPTION, arg);
                 }
 
                 // known option; skip its name

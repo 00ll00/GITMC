@@ -98,22 +98,9 @@ public class GitHandler {
 		});
 	}
 
-	/**
-	 * Execute the command line.
-	 *
-	 * @param argv
-	 *            arguments.
-	 * @throws Exception
-	 */
-//	public static void main(String[] argv) throws Exception {
-//		// make sure built-in filters are registered
-//		BuiltinLFS.register();
-//
-//		new GitHandler().run(argv);
-//	}
 
 	/**
-	 * Parse the command line and execute the requested action.
+	 * Execute the parsed command line. Should only be called after {@link #parse(String[])}
 	 *
 	 * Subclasses should allocate themselves and then invoke this method:
 	 *
@@ -125,16 +112,11 @@ public class GitHandler {
 	 * }
 	 * </pre>
 	 *
-	 * //@param argv
-	 *            arguments.
 	 * @throws Exception
 	 */
 	public void run(CommandSource source) throws Exception {
 		writer = createErrorWriter();
 		try {
-
-			//parse(argv);
-
 			if (argv.length == 0 || help) {
 				final String ex = clp.printExample(OptionHandlerFilter.ALL,
 						CLIText.get().resourceBundle());
@@ -165,7 +147,6 @@ public class GitHandler {
 					writer.println();
 				}
 				writer.flush();
-//			exit(1, null);
 				return;
 			}
 
@@ -181,14 +162,12 @@ public class GitHandler {
 			}
 		} catch (Die err) {
 			if (err.isAborted()) {
-//				exit(1, err);
 				return;
 			}
 			writer.println(CLIText.fatalError(err.getMessage()));
 			if (showStackTrace) {
 				err.printStackTrace(writer);
 			}
-//			exit(128, err);
 			return;
 		} catch (Exception err) {
 			// Try to detect errno == EPIPE and exit normally if that happens
@@ -198,12 +177,10 @@ public class GitHandler {
 			if (err.getClass() == IOException.class) {
 				// Linux, OS X
 				if (err.getMessage().equals("Broken pipe")) { //$NON-NLS-1$
-//					exit(0, err);
 					return;
 				}
 				// Windows
 				if (err.getMessage().equals("The pipe is being closed")) { //$NON-NLS-1$
-//					exit(0, err);
 					return;
 				}
 			}
@@ -217,32 +194,32 @@ public class GitHandler {
 				if (showStackTrace) {
 					err.printStackTrace();
 				}
-//				exit(128, err);
 				return;
 			}
 			err.printStackTrace();
-//			exit(1, err);
 			return;
 		}
 		if (System.out.checkError()) {
 			writer.println(CLIText.get().unknownIoErrorStdout);
-//			exit(1, null);
 			return;
 		}
 		if (writer.checkError()) {
 			// No idea how to present an error here, most likely disk full or
 			// broken pipe
-			//exit(1, null);
 			return;
 		}
-		//gcExecutor.shutdown();
-		//gcExecutor.awaitTermination(10, TimeUnit.MINUTES);
 	}
 
 	PrintWriter createErrorWriter() {
 		return new PrintWriter(new OutputStreamWriter(System.err, UTF_8));
 	}
 
+	/**
+	 * Parse command line. Invoke before {@link #run(CommandSource)}
+	 *
+	 * @throws Exception If current position can have suggestions then throw a {@link oolloo.gitmc.adapter.SugException}
+	 * @return GitHandler
+	 */
 	public GitHandler parse(String[] argvIn) throws Exception {
 
 		argv = argvIn;
@@ -262,7 +239,6 @@ public class GitHandler {
 				throw err;
 //				writer.println(CLIText.fatalError(err.getMessage()));
 //				writer.flush();
-//				exit(1, err);
 			}
 		}
 
@@ -292,17 +268,6 @@ public class GitHandler {
 			cmd.init(null, gitdir);
 		}
 	}
-
-	/**
-	 * @param status
-	 * @param t
-	 *            can be {@code null}
-	 * @throws Exception
-	 */
-//	void exit(int status, Exception t) throws Exception {
-//		writer.flush();
-//		System.exit(status);
-//	}
 
 	/**
 	 * Evaluate the {@code --git-dir} option and open the repository.

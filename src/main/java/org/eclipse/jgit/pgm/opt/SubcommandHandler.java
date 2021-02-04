@@ -10,6 +10,7 @@
 
 package org.eclipse.jgit.pgm.opt;
 
+import oolloo.gitmc.adapter.SubCmdSugException;
 import org.eclipse.jgit.pgm.CommandCatalog;
 import org.eclipse.jgit.pgm.CommandRef;
 import org.eclipse.jgit.pgm.TextBuiltin;
@@ -55,7 +56,7 @@ public class SubcommandHandler extends OptionHandler<TextBuiltin> {
 		final String name = params.getParameter(0);
 		final CommandRef cr = CommandCatalog.get(name);
 		if (cr == null)
-			throw new CmdLineException(clp,
+			throw new SubCmdSugException(clp,
 					CLIText.format(CLIText.get().notAJgitCommand), name);
 
 		// Force option parsing to stop. Everything after us should

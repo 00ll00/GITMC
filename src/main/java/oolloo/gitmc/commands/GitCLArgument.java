@@ -8,7 +8,9 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.text.StringTextComponent;
+import oolloo.gitmc.adapter.SugException;
 import org.eclipse.jgit.pgm.GitHandler;
 
 import java.util.ArrayList;
@@ -48,7 +50,20 @@ public class GitCLArgument implements ArgumentType<GitHandler> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return Suggestions.empty();
+        if (context.getSource() instanceof ISuggestionProvider) {
+            try {
+                StringReader reader = new StringReader(builder.getInput());
+                reader.setCursor(builder.getStart());
+                new GitHandler().parse(readArgs(reader));
+            } catch (SugException e) {
+                e.suggeste(builder);
+            } catch (Exception ignore) {
+            }
+//            builder.createOffset()
+            return builder.buildFuture();
+        } else {
+            return Suggestions.empty();
+        }
     }
 
     @Override

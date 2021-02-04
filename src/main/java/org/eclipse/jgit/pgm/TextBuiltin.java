@@ -253,18 +253,18 @@ public abstract class TextBuiltin {
 	 *            the arguments supplied on the command line, if any.
 	 * @throws IOException
 	 */
-	public void parseArguments(String[] args) throws IOException {
+	public void parseArguments(String[] args) throws Exception {
 		clp = new CmdLineParser(this);
 		help = containsHelp(args);
-		try {
+//		try {
 			clp.parseArgument(args);
-		} catch (CmdLineException err) {
-			this.errw.println(CLIText.fatalError(err.getMessage()));
-//			if (help) {
-//				printUsage("", clp); //$NON-NLS-1$
-//			}
-			throw die(true, err);
-		}
+//		} catch (CmdLineException err) {
+//			this.errw.println(CLIText.fatalError(err.getMessage()));
+////			if (help) {
+////				printUsage("", clp); //$NON-NLS-1$
+////			}
+//			throw die(true, err);
+//		}
 
 		argWalk = clp.getRevWalkGently();
 	}
