@@ -10,6 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.text.StringTextComponent;
+import oolloo.gitmc.adapter.ArgReader;
 import oolloo.gitmc.adapter.SugException;
 import org.eclipse.jgit.pgm.GitHandler;
 
@@ -42,7 +43,9 @@ public class GitCLArgument implements ArgumentType<GitHandler> {
     @Override
     public GitHandler parse(StringReader reader) throws CommandSyntaxException {
         try {
-            return new GitHandler().parse(readArgs(reader));
+            ArgReader argReader = new ArgReader(reader);
+            reader.setCursor(reader.getTotalLength());
+            return new GitHandler().parse(argReader);
         } catch (Exception e) {
             throw PARSE_FATAL.create(e.getMessage());
         }
@@ -54,41 +57,17 @@ public class GitCLArgument implements ArgumentType<GitHandler> {
             try {
                 StringReader reader = new StringReader(builder.getInput());
                 reader.setCursor(builder.getStart());
-                new GitHandler().parse(readArgs(reader));
+                new GitHandler().parse(new ArgReader(reader));
             } catch (SugException e) {
-                e.suggeste(builder);
+                return e.suggeste(builder).buildFuture();
             } catch (Exception ignore) {
             }
-//            builder.createOffset()
-            return builder.buildFuture();
-        } else {
-            return Suggestions.empty();
         }
+        return Suggestions.empty();
     }
 
     @Override
     public Collection<String> getExamples() {
         return null;
-    }
-
-    private String[] readArgs(StringReader reader) throws CommandSyntaxException {
-        reader.skipWhitespace();
-        ArrayList<String> args = new ArrayList<>();
-        while (reader.canRead()) {
-            StringBuilder builder = new StringBuilder();
-            while (reader.canRead()) {
-                if (StringReader.isQuotedStringStart(reader.peek())) {
-                    builder.append(reader.readQuotedString());
-                } else if(!Character.isWhitespace(reader.peek())) {
-                    builder.append(reader.peek());
-                    reader.skip();
-                } else {
-                    break;
-                }
-            }
-            args.add(builder.toString());
-            reader.skipWhitespace();
-        }
-        return args.toArray(new String[0]);
     }
 }

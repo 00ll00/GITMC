@@ -30,6 +30,7 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.pgm.internal.CLIText;
@@ -253,7 +254,7 @@ public abstract class TextBuiltin {
 	 *            the arguments supplied on the command line, if any.
 	 * @throws IOException
 	 */
-	public void parseArguments(String[] args) throws Exception {
+	public void parseArguments(ArgReader args) throws Exception {
 		clp = new CmdLineParser(this);
 		help = containsHelp(args);
 //		try {
@@ -447,8 +448,8 @@ public abstract class TextBuiltin {
 	 * @return true if the given array contains help option
 	 * @since 4.2
 	 */
-	public static boolean containsHelp(String[] args) {
-		for (String str : args) {
+	public static boolean containsHelp(ArgReader args) {
+		for (String str : args.args) {
 			if (str.equals("-h") || str.equals("--help")) { //$NON-NLS-1$ //$NON-NLS-2$
 				return true;
 			}

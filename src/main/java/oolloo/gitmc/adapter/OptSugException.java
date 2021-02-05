@@ -37,8 +37,9 @@ public class OptSugException extends SugException{
     }
 
     @Override
-    public void suggeste(SuggestionsBuilder builder) {
+    public SuggestionsBuilder suggeste(SuggestionsBuilder builder) {
         CmdLineParser parser = getParser();
+        builder = builder.createOffset(((ArgReader) parser.cmdLine).getCursor());
         for (OptionHandler o : parser.getOptions()) {
             OptionDef od = o.option;
             if (od instanceof NamedOptionDef) {
@@ -49,6 +50,7 @@ public class OptSugException extends SugException{
                 }
             }
         }
+        return builder;
     }
 
 

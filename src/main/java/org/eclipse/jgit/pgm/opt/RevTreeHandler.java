@@ -13,6 +13,7 @@ package org.eclipse.jgit.pgm.opt;
 
 import java.io.IOException;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.ObjectId;
@@ -54,8 +55,8 @@ public class RevTreeHandler extends OptionHandler<RevTree> {
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		final String name = params.getParameter(0);
+	public int parseArguments(ArgReader params) throws CmdLineException {
+		final String name = params.readArg(0);
 		final ObjectId id;
 		try {
 			id = clp.getRepository().resolve(name);

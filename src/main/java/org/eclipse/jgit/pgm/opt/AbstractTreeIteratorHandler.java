@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -65,8 +66,8 @@ public class AbstractTreeIteratorHandler extends
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		final String name = params.getParameter(0);
+	public int parseArguments(ArgReader params) throws CmdLineException {
+		final String name = params.readArg(0);
 
 		if (new File(name).isDirectory()) {
 			setter.addValue(new FileTreeIterator(

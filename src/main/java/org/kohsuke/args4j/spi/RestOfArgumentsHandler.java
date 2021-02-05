@@ -1,5 +1,6 @@
 package org.kohsuke.args4j.spi;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -22,10 +23,10 @@ public class RestOfArgumentsHandler extends OptionHandler<String> {
         super(cmdLineParser, optionDef, setter);
     }
 
-    public int parseArguments(Parameters parameters) throws CmdLineException {
-        for (int i=0; i<parameters.size(); i++)
-            setter.addValue(parameters.getParameter(i));
-        return parameters.size();
+    public int parseArguments(ArgReader parameters) throws CmdLineException {
+        for (int i=0; i<parameters.getLength(); i++)
+            setter.addValue(parameters.readArg(i));
+        return parameters.getLength();
     }
 
     public String getDefaultMetaVariable() {

@@ -10,6 +10,7 @@
 
 package org.eclipse.jgit.pgm.opt;
 
+import oolloo.gitmc.adapter.ArgReader;
 import oolloo.gitmc.adapter.SubCmdSugException;
 import org.eclipse.jgit.pgm.CommandCatalog;
 import org.eclipse.jgit.pgm.CommandRef;
@@ -52,8 +53,8 @@ public class SubcommandHandler extends OptionHandler<TextBuiltin> {
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		final String name = params.getParameter(0);
+	public int parseArguments(ArgReader params) throws CmdLineException {
+		final String name = params.readArg(0);
 		final CommandRef cr = CommandCatalog.get(name);
 		if (cr == null)
 			throw new SubCmdSugException(clp,

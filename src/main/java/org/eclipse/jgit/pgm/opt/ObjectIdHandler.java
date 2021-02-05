@@ -13,6 +13,7 @@ package org.eclipse.jgit.pgm.opt;
 
 import java.io.IOException;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.pgm.internal.CLIText;
 import org.kohsuke.args4j.CmdLineException;
@@ -51,8 +52,8 @@ public class ObjectIdHandler extends OptionHandler<ObjectId> {
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		final String name = params.getParameter(0);
+	public int parseArguments(ArgReader params) throws CmdLineException {
+		final String name = params.readArg(0);
 		final ObjectId id;
 		try {
 			id = clp.getRepository().resolve(name);

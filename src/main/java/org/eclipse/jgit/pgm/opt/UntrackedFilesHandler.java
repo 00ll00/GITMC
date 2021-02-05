@@ -9,6 +9,7 @@
  */
 package org.eclipse.jgit.pgm.opt;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.pgm.internal.CLIText;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -54,8 +55,8 @@ public class UntrackedFilesHandler extends StringOptionHandler {
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		String alias = params.getParameter(-1);
+	public int parseArguments(ArgReader params) throws CmdLineException {
+		String alias = params.readArg(-1);
 		if ("-u".equals(alias)) { //$NON-NLS-1$
 			setter.addValue("all"); //$NON-NLS-1$
 			return 0;
@@ -65,11 +66,11 @@ public class UntrackedFilesHandler extends StringOptionHandler {
 		} else if ("-uall".equals(alias)) { //$NON-NLS-1$
 			setter.addValue("all"); //$NON-NLS-1$
 			return 0;
-		} else if (params.size() == 0) {
+		} else if (params.getLength() == 0) {
 			setter.addValue("all"); //$NON-NLS-1$
 			return 0;
-		} else if (params.size() == 1) {
-			String mode = params.getParameter(0);
+		} else if (params.getLength() == 1) {
+			String mode = params.readArg(0);
 			if ("no".equals(mode) || "all".equals(mode)) { //$NON-NLS-1$ //$NON-NLS-2$
 				setter.addValue(mode);
 			} else {

@@ -1,5 +1,7 @@
 package org.kohsuke.args4j.spi;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -94,13 +96,13 @@ public class SubCommandHandler extends OptionHandler<Object> {
     }
 
     @Override
-    public int parseArguments(Parameters params) throws CmdLineException {
-        String subCmd = params.getParameter(0);
+    public int parseArguments(ArgReader params) throws CmdLineException, CommandSyntaxException {
+        String subCmd = params.readArg(0);
 
         for (SubCommand c : commands.value()) {
             if (c.name().equals(subCmd)) {
                 setter.addValue(subCommand(c,params));
-                return params.size();   // consume all the remaining tokens
+                return params.getLength();   // consume all the remaining tokens
             }
         }
 
@@ -111,25 +113,12 @@ public class SubCommandHandler extends OptionHandler<Object> {
         throw new CmdLineException(owner, Messages.ILLEGAL_OPERAND, option.toString(), subCmd);
     }
 
-    protected Object subCommand(SubCommand c, final Parameters params) throws CmdLineException {
+    protected Object subCommand(SubCommand c, final ArgReader params) throws CmdLineException, CommandSyntaxException {
         Object subCmd = instantiate(c);
         CmdLineParser p = configureParser(subCmd,c);
-        p.parseArgument(new AbstractList<String>() {
-            @Override
-            public String get(int index) {
-                try {
-                    return params.getParameter(index+1);
-                } catch (CmdLineException e) {
-                    // invalid index was accessed.
-                    throw new IndexOutOfBoundsException();
-                }
-            }
-
-            @Override
-            public int size() {
-                return params.size()-1;
-            }
-        });
+        ArgReader next = new ArgReader(params);
+        next.relatedPos += 1;
+        p.parseArgument(next);
         return subCmd;
     }
 

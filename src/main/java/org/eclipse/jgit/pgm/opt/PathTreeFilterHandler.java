@@ -13,6 +13,7 @@ package org.eclipse.jgit.pgm.opt;
 import java.util.ArrayList;
 import java.util.List;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.pgm.internal.CLIText;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
@@ -51,13 +52,12 @@ public class PathTreeFilterHandler extends OptionHandler<TreeFilter> {
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
+	public int parseArguments(ArgReader params) throws CmdLineException {
 		final List<PathFilter> filters = new ArrayList<>();
 		for (int idx = 0;; idx++) {
 			final String path;
-			try {
-				path = params.getParameter(idx);
-			} catch (CmdLineException cle) {
+			path = params.readArg(idx);
+			if (path == null) {
 				break;
 			}
 			filters.add(PathFilter.create(path));

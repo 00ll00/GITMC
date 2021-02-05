@@ -1,5 +1,6 @@
 package org.kohsuke.args4j.spi;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -38,7 +39,7 @@ public class StopOptionHandler extends OptionHandler<String> {
     }
 
     @Override
-    public int parseArguments(Parameters params) throws CmdLineException {
+    public int parseArguments(ArgReader params) throws CmdLineException {
     	owner.stopOptionParsing();
     	return 0;
     }

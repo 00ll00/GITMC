@@ -1,5 +1,7 @@
 package org.kohsuke.args4j.spi;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.*;
 
 import java.util.Collection;
@@ -63,7 +65,7 @@ public abstract class OptionHandler<T> {
      *      The number of arguments consumed. (For example, returns {@code 0}
      *      if this option doesn't take any parameters.)
      */
-    public abstract int parseArguments( Parameters params ) throws CmdLineException;
+    public abstract int parseArguments( ArgReader params ) throws CmdLineException, CommandSyntaxException;
 
     /**
      * Gets the default meta variable name used to print the usage screen.

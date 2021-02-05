@@ -30,6 +30,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import net.minecraft.command.CommandSource;
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.awtui.AwtAuthenticator;
 import org.eclipse.jgit.awtui.AwtCredentialsProvider;
 import org.eclipse.jgit.errors.TransportException;
@@ -77,7 +78,7 @@ public class GitHandler {
 
 	private CmdLineParser clp;
 	private TextBuiltin cmd;
-	private String[] argv;
+	private ArgReader argv;
 
 	/**
 	 * <p>Constructor for Main.</p>
@@ -100,7 +101,7 @@ public class GitHandler {
 
 
 	/**
-	 * Execute the parsed command line. Should only be called after {@link #parse(String[])}
+	 * Execute the parsed command line. Should only be called after {@link #parse(ArgReader)}
 	 *
 	 * Subclasses should allocate themselves and then invoke this method:
 	 *
@@ -117,7 +118,7 @@ public class GitHandler {
 	public void run(CommandSource source) throws Exception {
 		writer = createErrorWriter();
 		try {
-			if (argv.length == 0 || help) {
+			if (argv.getLength() == 0 || help) {
 				final String ex = clp.printExample(OptionHandlerFilter.ALL,
 						CLIText.get().resourceBundle());
 				writer.println("git" + ex + " command [ARG ...]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -220,7 +221,7 @@ public class GitHandler {
 	 * @throws Exception If current position can have suggestions then throw a {@link oolloo.gitmc.adapter.SugException}
 	 * @return GitHandler
 	 */
-	public GitHandler parse(String[] argvIn) throws Exception {
+	public GitHandler parse(ArgReader argvIn) throws Exception {
 
 		argv = argvIn;
 
@@ -235,14 +236,14 @@ public class GitHandler {
 		try {
 			clp.parseArgument(argv);
 		} catch (CmdLineException err) {
-			if (argv.length > 0 && !help && !version) {
+			if (argv.getLength() > 0 && !help && !version) {
 				throw err;
 //				writer.println(CLIText.fatalError(err.getMessage()));
 //				writer.flush();
 			}
 		}
 
-		if (argv.length == 0 || help) {
+		if (argv.getLength() == 0 || help) {
 			return this;
 		}
 
@@ -256,7 +257,9 @@ public class GitHandler {
 		cmd = subcommand;
 		init(cmd);
 
-		cmd.parseArguments(arguments.toArray(new String[0]));
+		argv.relatedPos += 1;
+//		cmd.parseArguments(arguments.toArray(new String[0]));
+		cmd.parseArguments(argv);
 
 		return this;
 	}
@@ -375,7 +378,7 @@ public class GitHandler {
 	}
 
 	public void help(CommandSource source) throws Exception {
-		parse(new String[0]);
+		parse(new ArgReader(""));
 		run(source);
 	}
 
@@ -389,7 +392,7 @@ public class GitHandler {
 		}
 
 		@Override
-		protected boolean containsHelp(String... args) {
+		protected boolean containsHelp(ArgReader args) {
 			return false;
 		}
 	}

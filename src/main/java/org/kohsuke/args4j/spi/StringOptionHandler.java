@@ -1,5 +1,6 @@
 package org.kohsuke.args4j.spi;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -15,8 +16,8 @@ public class StringOptionHandler extends OptionHandler<String> {
     }
 
     @Override
-    public int parseArguments(Parameters params) throws CmdLineException {
-        setter.addValue(params.getParameter(0));
+    public int parseArguments(ArgReader params) throws CmdLineException {
+        setter.addValue(params.readArg(0));
         return 1;
     }
 

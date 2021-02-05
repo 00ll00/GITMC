@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.pgm.Die;
@@ -110,42 +112,44 @@ public class CmdLineParser extends org.kohsuke.args4j.CmdLineParser {
 
 	/** {@inheritDoc} */
 	@Override
-	public void parseArgument(String... args) throws CmdLineException {
-		final ArrayList<String> tmp = new ArrayList<>(args.length);
-		for (int argi = 0; argi < args.length; argi++) {
-			final String str = args[argi];
-			if (str.equals("--")) { //$NON-NLS-1$
-				while (argi < args.length)
-					tmp.add(args[argi++]);
-				break;
-			}
+	public void parseArgument(ArgReader args) throws CmdLineException, CommandSyntaxException {
+//		final ArrayList<String> tmp = new ArrayList<>(args.length);
+//		for (int argi = 0; argi < args.length; argi++) {
+//			final String str = args.getArg(argi);
+//			if (str.equals("--")) { //$NON-NLS-1$
+//				while (argi < args.length)
+//					tmp.add(args.getArg(argi++));
+//				break;
+//			}
+//
+//			if (str.startsWith("--")) { //$NON-NLS-1$
+//				final int eq = str.indexOf('=');
+//				if (eq > 0) {
+//					tmp.add(str.substring(0, eq));
+//					tmp.add(str.substring(eq + 1));
+//					continue;
+//				}
+//			}
+//
+//			tmp.add(str);
+//
+//			if (containsHelp(args)) {
+//				// suppress exceptions on required parameters if help is present
+//				seenHelp = true;
+//				// stop argument parsing here
+//				break;
+//			}
+//		}
+		seenHelp = args.containHelp;
 
-			if (str.startsWith("--")) { //$NON-NLS-1$
-				final int eq = str.indexOf('=');
-				if (eq > 0) {
-					tmp.add(str.substring(0, eq));
-					tmp.add(str.substring(eq + 1));
-					continue;
-				}
-			}
-
-			tmp.add(str);
-
-			if (containsHelp(args)) {
-				// suppress exceptions on required parameters if help is present
-				seenHelp = true;
-				// stop argument parsing here
-				break;
-			}
-		}
 		List<OptionHandler> backup = null;
 		if (seenHelp) {
 			backup = unsetRequiredOptions();
 		}
 
 		try {
-			super.parseArgument(tmp.toArray(new String[0]));
-		} catch (Die e) {
+			super.parseArgument(args);
+		} catch (Die | CommandSyntaxException e) {
 			if (!seenHelp) {
 				throw e;
 			}
@@ -199,7 +203,7 @@ public class CmdLineParser extends org.kohsuke.args4j.CmdLineParser {
 	 * @return true if the given array contains help option
 	 * @since 4.2
 	 */
-	protected boolean containsHelp(String... args) {
+	protected boolean containsHelp(ArgReader args) {
 		return TextBuiltin.containsHelp(args);
 	}
 

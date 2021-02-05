@@ -6,6 +6,7 @@ import static java.lang.Boolean.TRUE;
 import java.util.HashMap;
 import java.util.Map;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -38,13 +39,13 @@ public class ExplicitBooleanOptionHandler extends OptionHandler<Boolean> {
     }
 
     @Override
-    public int parseArguments(Parameters params) throws CmdLineException {
+    public int parseArguments(ArgReader params) throws CmdLineException {
         // end of arg list or next arg is another option
-        if ((params.size() == 0) || params.getParameter(0).startsWith("-")) {
+        if ((params.getLength() == 0) || params.readArg(0).startsWith("-")) {
             setter.addValue(TRUE);
             return 0;
         } else {
-            setter.addValue(getBoolean(params.getParameter(0)));
+            setter.addValue(getBoolean(params.readArg(0)));
             return 1;
         }
     }

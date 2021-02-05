@@ -1,5 +1,6 @@
 package org.kohsuke.args4j.spi;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -30,8 +31,8 @@ public abstract class DelimitedOptionHandler<T> extends OptionHandler<T> {
     }
 
     @Override
-    public int parseArguments(Parameters params) throws CmdLineException {
-        String full = params.getParameter(0);
+    public int parseArguments(ArgReader params) throws CmdLineException {
+        String full = params.readArg(0);
         String[] delimitedStrs = full.split(delimiter);
         for (String delimitedStr : delimitedStrs) {
             setter.addValue(individualOptionHandler.parse(delimitedStr));

@@ -1,5 +1,6 @@
 package org.kohsuke.args4j.spi;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -22,14 +23,14 @@ public abstract class OneArgumentOptionHandler<T> extends OptionHandler<T> {
 	}
 
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-        String token = params.getParameter(0);
+	public int parseArguments(ArgReader params) throws CmdLineException {
+        String token = params.readArg(0);
         try {
             T value = parse(token);
             setter.addValue(value);
         }
         catch (NumberFormatException ex) {
-            throw new CmdLineException(owner, Messages.ILLEGAL_OPERAND, params.getParameter(-1), token);
+            throw new CmdLineException(owner, Messages.ILLEGAL_OPERAND, params.readArg(-1), token);
         }
         return 1;
 	}	

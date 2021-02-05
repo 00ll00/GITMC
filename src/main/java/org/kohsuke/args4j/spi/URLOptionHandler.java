@@ -1,5 +1,6 @@
 package org.kohsuke.args4j.spi;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -18,14 +19,14 @@ public class URLOptionHandler extends OptionHandler<URL> {
     }
 
     @Override
-    public int parseArguments(Parameters params) throws CmdLineException {
-        String param = params.getParameter(0);
+    public int parseArguments(ArgReader params) throws CmdLineException {
+        String param = params.readArg(0);
         try {
             setter.addValue(new URL(param));
             return 1;
         } catch (MalformedURLException e) {
             throw new CmdLineException(owner, Messages.ILLEGAL_OPERAND,
-                    params.getParameter(-1), param);
+                    params.readArg(-1), param);
         }
     }
 

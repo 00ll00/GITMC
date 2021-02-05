@@ -2,6 +2,7 @@ package org.kohsuke.args4j.spi;
 
 import java.util.ResourceBundle;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -21,8 +22,8 @@ public class EnumOptionHandler<T extends Enum<T>> extends OptionHandler<T> {
     }
 
     @Override
-    public int parseArguments(Parameters params) throws CmdLineException {
-        String s = params.getParameter(0).replaceAll("-", "_");
+    public int parseArguments(ArgReader params) throws CmdLineException {
+        String s = params.readArg(0).replaceAll("-", "_");
         T value = null;
         for( T o : enumType.getEnumConstants() )
             if(o.name().equalsIgnoreCase(s)) {
@@ -34,7 +35,7 @@ public class EnumOptionHandler<T extends Enum<T>> extends OptionHandler<T> {
             if (option.isArgument()) {
                 throw new CmdLineException(owner, Messages.ILLEGAL_OPERAND, option.toString(), s);
             } else {
-                throw new CmdLineException(owner, Messages.ILLEGAL_OPERAND, params.getParameter(-1),s);
+                throw new CmdLineException(owner, Messages.ILLEGAL_OPERAND, params.readArg(-1),s);
             }
         }
         setter.addValue(value);

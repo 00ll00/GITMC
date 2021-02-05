@@ -1,5 +1,6 @@
 package org.kohsuke.args4j.spi;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -26,8 +27,8 @@ public class MacAddressOptionHandler extends OptionHandler<byte[]> {
     }
 
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		String macString = params.getParameter(0);
+	public int parseArguments(ArgReader params) throws CmdLineException {
+		String macString = params.readArg(0);
 		String[] macStringArray = null;
 
 		if (macString.matches("[0-9a-fA-F]{12}"))

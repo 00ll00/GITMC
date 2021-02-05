@@ -13,6 +13,7 @@ package org.eclipse.jgit.pgm.opt;
 
 import java.io.IOException;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.ObjectId;
@@ -55,8 +56,8 @@ public class RevCommitHandler extends OptionHandler<RevCommit> {
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		String name = params.getParameter(0);
+	public int parseArguments(ArgReader params) throws CmdLineException {
+		String name = params.readArg(0);
 
 		boolean interesting = true;
 		if (name.startsWith("^")) { //$NON-NLS-1$

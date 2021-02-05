@@ -15,6 +15,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteAddCommand;
 import org.eclipse.jgit.api.RemoteListCommand;
@@ -89,17 +90,18 @@ class Remote extends TextBuiltin {
 				fetch.outw = new ThrowingPrintWriter(osw);
 				StringWriter esw = new StringWriter();
 				fetch.errw = new ThrowingPrintWriter(esw);
-				List<String> fetchArgs = new ArrayList<>();
+//				List<String> fetchArgs = new ArrayList<>();
+				StringBuilder fetchArgs = new StringBuilder();
 				if (verbose) {
-					fetchArgs.add("--verbose"); //$NON-NLS-1$
+					fetchArgs.append("--verbose "); //$NON-NLS-1$
 				}
 				if (prune) {
-					fetchArgs.add("--prune"); //$NON-NLS-1$
+					fetchArgs.append("--prune "); //$NON-NLS-1$
 				}
 				if (name != null) {
-					fetchArgs.add(name);
+					fetchArgs.append(name);
 				}
-				fetch.parseArguments(fetchArgs.toArray(new String[0]));
+				fetch.parseArguments(new ArgReader(fetchArgs.toString()));
 				fetch.execute();
 				fetch.outw.flush();
 				fetch.errw.flush();

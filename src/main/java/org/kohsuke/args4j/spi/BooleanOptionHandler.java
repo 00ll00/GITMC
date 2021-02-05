@@ -3,6 +3,7 @@ package org.kohsuke.args4j.spi;
 import java.util.Arrays;
 import java.util.List;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -21,9 +22,9 @@ public class BooleanOptionHandler extends OptionHandler<Boolean> {
     }
 
     @Override
-    public int parseArguments(Parameters params) throws CmdLineException {
+    public int parseArguments(ArgReader params) throws CmdLineException {
     	if (option.isArgument()) {
-    		String valueStr = params.getParameter(0).toLowerCase();
+    		String valueStr = params.readArg(0).toLowerCase();
     		int index = ACCEPTABLE_VALUES.indexOf(valueStr);
     		if (index == -1) {
     			throw new CmdLineException(owner, Messages.ILLEGAL_BOOLEAN, valueStr);

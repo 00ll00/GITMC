@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import oolloo.gitmc.adapter.ArgReader;
 import oolloo.gitmc.adapter.OptSugException;
 import org.kohsuke.args4j.spi.Getter;
 
@@ -54,6 +56,8 @@ public class CmdLineParser {
      * settings for the parser
 	 */
 	private ParserProperties parserProperties;
+
+	public CmdLineImpl cmdLine;
 
     /**
      * Creates a new command line owner that
@@ -405,21 +409,20 @@ public class CmdLineParser {
      * Essentially a pointer over a {@link String} array.
      * Can move forward; can look ahead.
      */
-    private class CmdLineImpl implements Parameters {
-        private final String[] args;
+    private class CmdLineImpl extends ArgReader {
         private int pos;
 
-        CmdLineImpl( String[] args ) {
-            this.args = args;
+        CmdLineImpl( ArgReader args ) throws CommandSyntaxException {
+            super(args);
             pos = 0;
         }
 
         protected boolean hasMore() {
-            return pos<args.length;
+            return pos<getLength();
         }
 
         protected String getCurrentToken() {
-            return args[pos];
+            return readCurrent();
         }
 
         private void proceed( int n ) {
@@ -427,13 +430,13 @@ public class CmdLineParser {
         }
 
         public String getParameter(int idx) throws CmdLineException {
-			if( pos+idx>=args.length || pos+idx<0 )
+			if( pos+idx>=getLength() || pos+idx<0 )
                 throw new CmdLineException(CmdLineParser.this, Messages.MISSING_OPERAND, getOptionName());
-            return args[pos+idx];
+            return readArg(pos+idx);
         }
 
         public int size() {
-            return args.length-pos;
+            return getLength()-pos;
         }
 
         /**
@@ -441,10 +444,10 @@ public class CmdLineParser {
          * to replace the current token by "value", as if this was given as two tokens "-option value"
          */
         void splitToken() {
-            if (pos < args.length && pos >= 0) {
-                int idx = args[pos].indexOf("=");
+            if (pos < getLength() && pos >= 0) {
+                int idx = getArg(pos).indexOf("=");
                 if (idx > 0) {
-                    args[pos] = args[pos].substring(idx + 1);
+                    args.set(pos, readArg(pos).substring(idx + 1));
                 }
             }
         }
@@ -457,9 +460,9 @@ public class CmdLineParser {
     /**
      * Same as {@link #parseArgument(String[])}
      */
-    public void parseArgument(Collection<String> args) throws CmdLineException {
-        parseArgument(args.toArray(new String[args.size()]));
-    }
+//    public void parseArgument(ArgReader args) throws CmdLineException {
+//        parseArgument(toArray(new String[size()]));
+//    }
 
     /**
      * Parses the command line arguments and set them to the option bean
@@ -472,15 +475,15 @@ public class CmdLineParser {
      *      {@link Option#required() required} option was not given.
      * @throws NullPointerException if {@code args} is {@code null}.
      */
-    public void parseArgument(final String... args) throws CmdLineException {
+    public void parseArgument(final ArgReader args) throws CmdLineException, CommandSyntaxException {
         
         checkNonNull(args, "args");
         
-        String expandedArgs[] = args;
-        if (parserProperties.getAtSyntax()) {
-            expandedArgs = expandAtFiles(args);
-        }
-        CmdLineImpl cmdLine = new CmdLineImpl(expandedArgs);
+//        String expandedArgs[] = args;
+//        if (parserProperties.getAtSyntax()) {
+//            expandedArgs = expandAtFiles(args);
+//        }
+        cmdLine = new CmdLineImpl(args);
 
         Set<OptionHandler> present = new HashSet<OptionHandler>();
         int argIndex = 0;
@@ -692,7 +695,7 @@ public class CmdLineParser {
      *      is of this type.
      * @param handlerClass
      *      This class must have the constructor that has the same signature as
-     *      {@link OptionHandler#OptionHandler(CmdLineParser, OptionDef, Setter)}
+     *      {@link OptionHandler#//OptionHandler(CmdLineParser, OptionDef, Setter)}
      * @throws NullPointerException if {@code valueType} or {@code handlerClass} is {@code null}.
      * @throws IllegalArgumentException if {@code handlerClass} is not a subtype of {@code OptionHandler}.
      * @deprecated You should use {@link OptionHandlerRegistry#registerHandler(Class, Class)} instead.

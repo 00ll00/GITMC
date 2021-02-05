@@ -10,6 +10,7 @@
 
 package org.eclipse.jgit.pgm.opt;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.pgm.internal.CLIText;
 import org.eclipse.jgit.transport.RefSpec;
 import org.kohsuke.args4j.CmdLineException;
@@ -45,8 +46,8 @@ public class RefSpecHandler extends OptionHandler<RefSpec> {
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		setter.addValue(new RefSpec(params.getParameter(0)));
+	public int parseArguments(ArgReader params) throws CmdLineException {
+		setter.addValue(new RefSpec(params.readArg(0)));
 		return 1;
 	}
 

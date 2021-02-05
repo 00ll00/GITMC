@@ -1,5 +1,6 @@
 package org.kohsuke.args4j.spi;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -52,10 +53,10 @@ public class StringArrayOptionHandler extends OptionHandler<String> {
 	 * Tries to parse {@code String[]} argument from {@link Parameters}.
 	 */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
+	public int parseArguments(ArgReader params) throws CmdLineException {
         int counter=0;
-		for (; counter<params.size(); counter++) {
-			String param = params.getParameter(counter);
+		for (; counter<params.getLength(); counter++) {
+			String param = params.readArg(counter);
 
             if(param.startsWith("-")) {
 				break;

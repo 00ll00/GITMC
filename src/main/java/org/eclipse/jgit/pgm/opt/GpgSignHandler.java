@@ -9,6 +9,7 @@
  */
 package org.eclipse.jgit.pgm.opt;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
@@ -55,11 +56,11 @@ public class GpgSignHandler extends StringOptionHandler {
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		String alias = params.getParameter(-1);
+	public int parseArguments(ArgReader params) throws CmdLineException {
+		String alias = params.readArg(-1);
 		if ("--gpg-sign".equals(alias) || "-S".equals(alias)) { //$NON-NLS-1$ //$NON-NLS-2$
 			try {
-				String key = params.getParameter(0);
+				String key = params.readArg(0);
 				if (key == null || key.startsWith("-")) { //$NON-NLS-1$
 					// ignore invalid values and assume default
 					setter.addValue(DEFAULT);

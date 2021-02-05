@@ -35,5 +35,5 @@ public abstract class SugException extends CmdLineException {
         super(parser, cause);
     }
 
-    public abstract void suggeste (SuggestionsBuilder builder);
+    public abstract SuggestionsBuilder suggeste (SuggestionsBuilder builder);
 }

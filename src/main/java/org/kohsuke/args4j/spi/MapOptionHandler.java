@@ -3,6 +3,7 @@ package org.kohsuke.args4j.spi;
 import java.util.HashMap;
 import java.util.Map;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.kohsuke.args4j.*;
 
 /**
@@ -34,7 +35,7 @@ public class MapOptionHandler extends OptionHandler<Map<?,?>> {
 	}
 
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
+	public int parseArguments(ArgReader params) throws CmdLineException {
         FieldSetter fs = setter.asFieldSetter();
         Map v = (Map)fs.getValue();
         if (v==null) {
@@ -42,7 +43,7 @@ public class MapOptionHandler extends OptionHandler<Map<?,?>> {
             fs.addValue(v);
         }
 
-        addToMap(params.getParameter(0),v);
+        addToMap(params.readArg(0),v);
 
         return 1;
 	}

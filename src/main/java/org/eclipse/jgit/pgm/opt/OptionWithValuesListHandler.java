@@ -3,6 +3,7 @@ package org.eclipse.jgit.pgm.opt;
 import java.util.ArrayList;
 import java.util.List;
 
+import oolloo.gitmc.adapter.ArgReader;
 import org.eclipse.jgit.pgm.internal.CLIText;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -35,15 +36,11 @@ public class OptionWithValuesListHandler extends OptionHandler<List<?>> {
 
 	/** {@inheritDoc} */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
+	public int parseArguments(ArgReader params) throws CmdLineException {
 		final List<String> list = new ArrayList<>();
-		for (int idx = 0; idx < params.size(); idx++) {
+		for (int idx = 0; idx < params.getLength(); idx++) {
 			final String p;
-			try {
-				p = params.getParameter(idx);
-			} catch (CmdLineException cle) {
-				break;
-			}
+			p = params.readArg(idx);
 			list.add(p);
 		}
 		setter.addValue(list);
