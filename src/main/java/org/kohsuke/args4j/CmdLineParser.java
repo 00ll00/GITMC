@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,6 +19,7 @@ import java.util.Set;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import oolloo.gitmc.adapter.ArgReader;
 import oolloo.gitmc.adapter.OptSugException;
+import oolloo.gitmc.adapter.Writer;
 import org.kohsuke.args4j.spi.Getter;
 
 import org.kohsuke.args4j.spi.OptionHandler;
@@ -265,9 +265,9 @@ public class CmdLineParser {
      * This is a convenience method for calling {@code printUsage(new OutputStreamWriter(out),null)}
      * so that you can do {@code printUsage(System.err)}.
      */
-    public void printUsage(OutputStream out) {
-        printUsage(new OutputStreamWriter(out),null);
-    }
+//    public void printUsage(OutputStream out) {
+//        printUsage(new OutputStreamWriter(out),null);
+//    }
 
     /**
      * Prints the list of all the non-hidden options and their usages to the screen.
@@ -288,8 +288,8 @@ public class CmdLineParser {
      * @param filter
      *      Controls which options to be printed.
      */
-    public void printUsage(Writer out, ResourceBundle rb, OptionHandlerFilter filter) {
-        PrintWriter w = new PrintWriter(out);
+    public void printUsage(Writer w, ResourceBundle rb, OptionHandlerFilter filter) {
+//        PrintWriter w = new PrintWriter(out);
         // determine the length of the option + metavar first
         int len = 0;
         for (OptionHandler h : arguments) {
@@ -325,7 +325,7 @@ public class CmdLineParser {
      * @param rb       {@code ResourceBundle} for I18N
      * @see Setter#asAnnotatedElement()
      */
-    protected void printOption(PrintWriter out, OptionHandler handler, int len, ResourceBundle rb, OptionHandlerFilter filter) {
+    protected void printOption(Writer out, OptionHandler handler, int len, ResourceBundle rb, OptionHandlerFilter filter) {
     	// Hiding options without usage information
     	if (handler.option.usage() == null ||
             handler.option.usage().length() == 0 ||
@@ -737,11 +737,11 @@ public class CmdLineParser {
      * so that you can do {@code printUsage(System.err)}.
      * @throws NullPointerException if {@code out} is {@code null}.
      */
-	public void printSingleLineUsage(OutputStream out) {
-        checkNonNull(out, "OutputStream");
-        
-		printSingleLineUsage(new OutputStreamWriter(out), null);
-	}
+//	public void printSingleLineUsage(OutputStream out) {
+//        checkNonNull(out, "OutputStream");
+//
+//		printSingleLineUsage(new OutputStreamWriter(out), null);
+//	}
 
     /**
      * Prints a single-line usage to the screen.
@@ -752,10 +752,10 @@ public class CmdLineParser {
      * @throws NullPointerException if {@code w} is {@code null}.
      */
     // TODO test this!
-	public void printSingleLineUsage(Writer w, ResourceBundle rb) {
-        checkNonNull(w, "Writer");
+	public void printSingleLineUsage(Writer pw, ResourceBundle rb) {
+        checkNonNull(pw, "Writer");
         
-		PrintWriter pw = new PrintWriter(w);
+//		PrintWriter pw = new PrintWriter(w);
 		for (OptionHandler h : arguments) {
 			printSingleLineOption(pw, h, rb);
 		}
@@ -765,7 +765,7 @@ public class CmdLineParser {
 		pw.flush();
 	}
 
-	private void printSingleLineOption(PrintWriter pw, OptionHandler h, ResourceBundle rb) {
+	private void printSingleLineOption(Writer pw, OptionHandler h, ResourceBundle rb) {
 		pw.print(' ');
 		if (!h.option.required())
 			pw.print('[');

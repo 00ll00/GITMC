@@ -52,7 +52,7 @@ class Clean extends TextBuiltin {
 				outw.println(MessageFormat.format(CLIText.get().removing,
 						removedFile));
 			}
-		} catch (NoWorkTreeException | GitAPIException | IOException e) {
+		} catch (NoWorkTreeException | GitAPIException e) {
 			throw die(e.getMessage(), e);
 		}
 	}

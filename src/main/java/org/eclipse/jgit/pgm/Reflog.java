@@ -38,7 +38,7 @@ class Reflog extends TextBuiltin {
 			for (ReflogEntry entry : entries) {
 				outw.println(toString(entry, i++));
 			}
-		} catch (GitAPIException | IOException e) {
+		} catch (GitAPIException e) {
 			throw die(e.getMessage(), e);
 		}
 	}

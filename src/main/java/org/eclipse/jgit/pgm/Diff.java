@@ -22,6 +22,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import oolloo.gitmc.adapter.Writer;
 import org.eclipse.jgit.diff.DiffAlgorithm;
 import org.eclipse.jgit.diff.DiffAlgorithm.SupportedAlgorithm;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -194,7 +195,7 @@ class Diff extends TextBuiltin {
 		}
 	}
 
-	static void nameStatus(ThrowingPrintWriter out, List<DiffEntry> files)
+	static void nameStatus(Writer out, List<DiffEntry> files)
 			throws IOException {
 		for (DiffEntry ent : files) {
 			switch (ent.getChangeType()) {

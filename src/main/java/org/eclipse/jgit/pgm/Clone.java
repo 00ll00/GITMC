@@ -124,38 +124,26 @@ class Clone extends AbstractFetchCommand implements CloneCommand.Callback {
 	/** {@inheritDoc} */
 	@Override
 	public void initializedSubmodules(Collection<String> submodules) {
-		try {
-			for (String submodule : submodules) {
-				outw.println(MessageFormat
-						.format(CLIText.get().submoduleRegistered, submodule));
-			}
-			outw.flush();
-		} catch (IOException e) {
-			// ignore
+		for (String submodule : submodules) {
+			outw.println(MessageFormat
+					.format(CLIText.get().submoduleRegistered, submodule));
 		}
+		outw.flush();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void cloningSubmodule(String path) {
-		try {
-			outw.println(MessageFormat.format(
-					CLIText.get().cloningInto, path));
-			outw.flush();
-		} catch (IOException e) {
-			// ignore
-		}
+		outw.println(MessageFormat.format(
+				CLIText.get().cloningInto, path));
+		outw.flush();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void checkingOut(AnyObjectId commit, String path) {
-		try {
-			outw.println(MessageFormat.format(CLIText.get().checkingOut,
-					path, commit.getName()));
-			outw.flush();
-		} catch (IOException e) {
-			// ignore
-		}
+		outw.println(MessageFormat.format(CLIText.get().checkingOut,
+				path, commit.getName()));
+		outw.flush();
 	}
 }

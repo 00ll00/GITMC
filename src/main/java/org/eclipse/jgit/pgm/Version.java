@@ -40,12 +40,8 @@ class Version extends TextBuiltin {
 			throw die(CLIText.get().cannotReadPackageInformation);
 		}
 
-		try {
-			outw.println(
-					MessageFormat.format(CLIText.get().jgitVersion, version));
-		} catch (IOException e) {
-			throw die(e.getMessage(), e);
-		}
+		outw.println(
+				MessageFormat.format(CLIText.get().jgitVersion, version));
 	}
 
 	/** {@inheritDoc} */

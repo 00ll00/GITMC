@@ -19,6 +19,7 @@ import static java.lang.Character.valueOf;
 import java.io.IOException;
 import java.text.MessageFormat;
 
+import oolloo.gitmc.adapter.Writer;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
@@ -70,7 +71,7 @@ abstract class AbstractFetchCommand extends TextBuiltin {
 		}
 	}
 
-	static void showRemoteMessages(ThrowingPrintWriter writer, String pkt) throws IOException {
+	static void showRemoteMessages(Writer writer, String pkt) throws IOException {
 		while (0 < pkt.length()) {
 			final int lf = pkt.indexOf('\n');
 			final int cr = pkt.indexOf('\r');

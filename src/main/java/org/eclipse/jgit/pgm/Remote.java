@@ -86,11 +86,13 @@ class Remote extends TextBuiltin {
 			case "update": //$NON-NLS-1$
 				Fetch fetch = new Fetch();
 				fetch.init(db, gitdir);
-				StringWriter osw = new StringWriter();
-				fetch.outw = new ThrowingPrintWriter(osw);
-				StringWriter esw = new StringWriter();
-				fetch.errw = new ThrowingPrintWriter(esw);
+//				StringWriter osw = new StringWriter();
+//				fetch.outw = new ThrowingPrintWriter(osw);
+//				StringWriter esw = new StringWriter();
+//				fetch.errw = new ThrowingPrintWriter(esw);
 //				List<String> fetchArgs = new ArrayList<>();
+				fetch.outw = outw;
+				fetch.errw = errw;
 				StringBuilder fetchArgs = new StringBuilder();
 				if (verbose) {
 					fetchArgs.append("--verbose "); //$NON-NLS-1$
@@ -105,8 +107,8 @@ class Remote extends TextBuiltin {
 				fetch.execute();
 				fetch.outw.flush();
 				fetch.errw.flush();
-				outw.println(osw.toString());
-				errw.println(esw.toString());
+//				outw.println(osw.toString());
+//				errw.println(esw.toString());
 				break;
 			default:
 				throw new JGitInternalException(MessageFormat

@@ -30,7 +30,9 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import net.minecraft.command.CommandSource;
 import oolloo.gitmc.adapter.ArgReader;
+import oolloo.gitmc.adapter.Writer;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.pgm.internal.CLIText;
@@ -78,7 +80,7 @@ public abstract class TextBuiltin {
 	 *
 	 * @since 2.2
 	 */
-	protected ThrowingPrintWriter outw;
+	protected Writer outw;
 
 	/**
 	 * Stream to output to, typically this is standard output.
@@ -92,7 +94,7 @@ public abstract class TextBuiltin {
 	 *
 	 * @since 3.4
 	 */
-	protected ThrowingPrintWriter errw;
+	protected Writer errw;
 
 	/**
 	 * Error output stream, typically this is standard error.
@@ -111,6 +113,7 @@ public abstract class TextBuiltin {
 	protected RevWalk argWalk;
 
 	private CmdLineParser clp;
+	private CommandSource source;
 
 	final void setCommandName(String name) {
 		commandName = name;
@@ -186,16 +189,16 @@ public abstract class TextBuiltin {
 	protected void init(Repository repository, String gitDir) {
 		Charset charset = getLogOutputEncodingCharset(repository);
 
-		if (ins == null)
-			ins = new FileInputStream(FileDescriptor.in);
-		if (outs == null)
-			outs = new FileOutputStream(FileDescriptor.out);
-		if (errs == null)
-			errs = new FileOutputStream(FileDescriptor.err);
-		outw = new ThrowingPrintWriter(new BufferedWriter(
-				new OutputStreamWriter(outs, charset)));
-		errw = new ThrowingPrintWriter(new BufferedWriter(
-				new OutputStreamWriter(errs, charset)));
+//		if (ins == null)
+//			ins = new FileInputStream(FileDescriptor.in);
+//		if (outs == null)
+//			outs = new FileOutputStream(FileDescriptor.out);
+//		if (errs == null)
+//			errs = new FileOutputStream(FileDescriptor.err);
+//		outw = new ThrowingPrintWriter(new BufferedWriter(
+//				new OutputStreamWriter(outs, charset)));
+//		errw = new ThrowingPrintWriter(new BufferedWriter(
+//				new OutputStreamWriter(errs, charset)));
 
 		if (repository != null && repository.getDirectory() != null) {
 			db = repository;
@@ -206,6 +209,10 @@ public abstract class TextBuiltin {
 		}
 	}
 
+	protected void initSource(CommandSource source) {
+		errw = new Writer(source,true);
+		outw = new Writer(source);
+	}
 	/**
 	 * Parse arguments and run this command.
 	 *
@@ -258,7 +265,7 @@ public abstract class TextBuiltin {
 		clp = new CmdLineParser(this);
 		help = containsHelp(args);
 //		try {
-			clp.parseArgument(args);
+		clp.parseArgument(args);
 //		} catch (CmdLineException err) {
 //			this.errw.println(CLIText.fatalError(err.getMessage()));
 ////			if (help) {
@@ -326,7 +333,7 @@ public abstract class TextBuiltin {
 	 * @return error writer, typically this is standard error.
 	 * @since 4.2
 	 */
-	public ThrowingPrintWriter getErrorWriter() {
+	public Writer getErrorWriter() {
 		return errw;
 	}
 
@@ -336,7 +343,7 @@ public abstract class TextBuiltin {
 	 * @return output writer, typically this is standard output.
 	 * @since 4.9
 	 */
-	public ThrowingPrintWriter getOutputWriter() {
+	public Writer getOutputWriter() {
 		return outw;
 	}
 

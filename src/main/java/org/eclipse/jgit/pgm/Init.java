@@ -58,7 +58,7 @@ class Init extends TextBuiltin {
 			outw.println(MessageFormat.format(
 					CLIText.get().initializedEmptyGitRepositoryIn,
 					repository.getDirectory().getAbsolutePath()));
-		} catch (GitAPIException | IOException e) {
+		} catch (GitAPIException e) {
 			throw die(e.getMessage(), e);
 		}
 	}

@@ -11,12 +11,8 @@
 
 package org.eclipse.jgit.pgm;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,10 +23,10 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 import net.minecraft.command.CommandSource;
 import oolloo.gitmc.adapter.ArgReader;
+import oolloo.gitmc.adapter.Writer;
 import org.eclipse.jgit.awtui.AwtAuthenticator;
 import org.eclipse.jgit.awtui.AwtCredentialsProvider;
 import org.eclipse.jgit.errors.TransportException;
@@ -47,8 +43,6 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.OptionHandlerFilter;
-
-import javax.xml.soap.Text;
 
 /**
  * Command line entry point.
@@ -72,13 +66,15 @@ public class GitHandler {
 	@Argument(index = 1, metaVar = "metaVar_arg")
 	private List<String> arguments = new ArrayList<>();
 
-	PrintWriter writer;
+	Writer writer;
 
 	private ExecutorService gcExecutor;
 
 	private CmdLineParser clp;
 	private TextBuiltin cmd;
 	private ArgReader argv;
+	private CommandSource source;
+	private static boolean busy = false;
 
 	/**
 	 * <p>Constructor for Main.</p>
@@ -115,104 +111,126 @@ public class GitHandler {
 	 *
 	 * @throws Exception
 	 */
-	public void run(CommandSource source) throws Exception {
-		writer = createErrorWriter();
-		try {
-			if (argv.getLength() == 0 || help) {
-				final String ex = clp.printExample(OptionHandlerFilter.ALL,
-						CLIText.get().resourceBundle());
-				writer.println("git" + ex + " command [ARG ...]"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (help) {
-					writer.println();
-					clp.printUsage(writer, CLIText.get().resourceBundle());
-					writer.println();
-				} else if (subcommand == null) {
-					writer.println();
-					writer.println(CLIText.get().mostCommonlyUsedCommandsAre);
-					final CommandRef[] common = CommandCatalog.common();
-					int width = 0;
-					for (CommandRef c : common) {
-						width = Math.max(width, c.getName().length());
-					}
-					width += 2;
-
-					for (CommandRef c : common) {
-						writer.print(' ');
-						writer.print(c.getName());
-						for (int i = c.getName().length(); i < width; i++) {
-							writer.print(' ');
+	public void run(CommandSource sourceIn) throws Exception {
+		source = sourceIn;
+		if (busy) {
+			return;
+		}
+		Thread thr = new GitRun();
+		thr.start();
+	}
+	private class GitRun extends Thread {
+		@Override
+		public void run() {
+			try	{
+				busy = true;
+				gitRun();
+			} finally {
+				busy = false;
+			}
+		}
+		private void gitRun() {
+			writer = createErrorWriter(source);
+			try {
+				//git help
+				if (argv.getLength() == 0 || help) {
+					final String ex = clp.printExample(OptionHandlerFilter.ALL,
+							CLIText.get().resourceBundle());
+					writer.println("git" + ex + " command [ARG ...]"); //$NON-NLS-1$ //$NON-NLS-2$
+					if (help) {
+						writer.println();
+						clp.printUsage(writer, CLIText.get().resourceBundle());
+						writer.println();
+					} else if (subcommand == null) {
+						writer.println();
+						writer.println(CLIText.get().mostCommonlyUsedCommandsAre);
+						final CommandRef[] common = CommandCatalog.common();
+						int width = 0;
+						for (CommandRef c : common) {
+							width = Math.max(width, c.getName().length());
 						}
-						writer.print(CLIText.get().resourceBundle().getString(c.getUsage()));
+						width += 2;
+
+						for (CommandRef c : common) {
+							writer.print(' ');
+							writer.print(c.getName());
+							for (int i = c.getName().length(); i < width; i++) {
+								writer.print(' ');
+							}
+							writer.print(CLIText.get().resourceBundle().getString(c.getUsage()));
+							writer.println();
+						}
 						writer.println();
 					}
-					writer.println();
-				}
-				writer.flush();
-				return;
-			}
-
-			try {
-				cmd.execute();
-			} finally {
-				if (cmd.outw != null) {
-					cmd.outw.flush();
-				}
-				if (cmd.errw != null) {
-					cmd.errw.flush();
-				}
-			}
-		} catch (Die err) {
-			if (err.isAborted()) {
-				return;
-			}
-			writer.println(CLIText.fatalError(err.getMessage()));
-			if (showStackTrace) {
-				err.printStackTrace(writer);
-			}
-			return;
-		} catch (Exception err) {
-			// Try to detect errno == EPIPE and exit normally if that happens
-			// There may be issues with operating system versions and locale,
-			// but we can probably assume that these messages will not be thrown
-			// under other circumstances.
-			if (err.getClass() == IOException.class) {
-				// Linux, OS X
-				if (err.getMessage().equals("Broken pipe")) { //$NON-NLS-1$
+					writer.flush();
 					return;
 				}
-				// Windows
-				if (err.getMessage().equals("The pipe is being closed")) { //$NON-NLS-1$
+
+				//sub command
+				try {
+					cmd.initSource(source);
+					cmd.execute();
+				} finally {
+					if (cmd.outw != null) {
+						cmd.outw.flush();
+					}
+					if (cmd.errw != null) {
+						cmd.errw.flush();
+					}
+				}
+			} catch (Die err) {
+				if (err.isAborted()) {
 					return;
 				}
-			}
-			if (!showStackTrace && err.getCause() != null
-					&& err instanceof TransportException) {
-				writer.println(CLIText.fatalError(err.getCause().getMessage()));
-			}
-
-			if (err.getClass().getName().startsWith("org.eclipse.jgit.errors.")) { //$NON-NLS-1$
 				writer.println(CLIText.fatalError(err.getMessage()));
-				if (showStackTrace) {
-					err.printStackTrace();
+//				if (showStackTrace) {
+//					err.printStackTrace(writer);
+//				}
+				return;
+			} catch (Exception err) {
+				// Try to detect errno == EPIPE and exit normally if that happens
+				// There may be issues with operating system versions and locale,
+				// but we can probably assume that these messages will not be thrown
+				// under other circumstances.
+				if (err.getClass() == IOException.class) {
+					// Linux, OS X
+					if (err.getMessage().equals("Broken pipe")) { //$NON-NLS-1$
+						return;
+					}
+					// Windows
+					if (err.getMessage().equals("The pipe is being closed")) { //$NON-NLS-1$
+						return;
+					}
 				}
+				if (!showStackTrace && err.getCause() != null
+						&& err instanceof TransportException) {
+					writer.println(CLIText.fatalError(err.getCause().getMessage()));
+				}
+
+				if (err.getClass().getName().startsWith("org.eclipse.jgit.errors.")) { //$NON-NLS-1$
+					writer.println(CLIText.fatalError(err.getMessage()));
+					if (showStackTrace) {
+						err.printStackTrace();
+					}
+					return;
+				}
+				err.printStackTrace();
 				return;
 			}
-			err.printStackTrace();
-			return;
-		}
-		if (System.out.checkError()) {
-			writer.println(CLIText.get().unknownIoErrorStdout);
-			return;
-		}
-		if (writer.checkError()) {
-			// No idea how to present an error here, most likely disk full or
-			// broken pipe
-			return;
+//			if (System.out.checkError()) {
+//				writer.println(CLIText.get().unknownIoErrorStdout);
+//				return;
+//			}
+//			if (writer.checkError()) {
+//				// No idea how to present an error here, most likely disk full or
+//				// broken pipe
+//				return;
+//			}
 		}
 	}
 
-	PrintWriter createErrorWriter() {
-		return new PrintWriter(new OutputStreamWriter(System.err, UTF_8));
+	Writer createErrorWriter(CommandSource source) {
+		return new Writer(source,true);
 	}
 
 	/**

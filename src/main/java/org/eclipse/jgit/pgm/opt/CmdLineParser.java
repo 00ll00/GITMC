@@ -11,7 +11,6 @@
 package org.eclipse.jgit.pgm.opt;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,6 +19,7 @@ import java.util.ResourceBundle;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import oolloo.gitmc.adapter.ArgReader;
+import oolloo.gitmc.adapter.Writer;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.pgm.Die;
@@ -167,11 +167,7 @@ public class CmdLineParser extends org.kohsuke.args4j.CmdLineParser {
 		if (cmd == null) {
 			System.err.println(error);
 		} else {
-			try {
-				cmd.getErrorWriter().println(error);
-			} catch (IOException e1) {
-				System.err.println(error);
-			}
+			cmd.getErrorWriter().println(error);
 		}
 	}
 
