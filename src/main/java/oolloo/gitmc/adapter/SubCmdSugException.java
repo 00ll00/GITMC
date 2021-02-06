@@ -1,7 +1,6 @@
 package oolloo.gitmc.adapter;
 
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import org.codehaus.plexus.util.cli.Arg;
 import org.eclipse.jgit.pgm.CommandCatalog;
 import org.eclipse.jgit.pgm.CommandRef;
 import org.kohsuke.args4j.CmdLineParser;

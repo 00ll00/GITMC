@@ -117,7 +117,7 @@ public class SubCommandHandler extends OptionHandler<Object> {
         Object subCmd = instantiate(c);
         CmdLineParser p = configureParser(subCmd,c);
         ArgReader next = new ArgReader(params);
-        next.relatedPos += 1;
+        next.pos += 1;
         p.parseArgument(next);
         return subCmd;
     }

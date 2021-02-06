@@ -257,7 +257,8 @@ public class GitHandler {
 		cmd = subcommand;
 		init(cmd);
 
-		argv.relatedPos += 1;
+		//TODO:fix subcommand args input
+		argv.pos += 1;
 //		cmd.parseArguments(arguments.toArray(new String[0]));
 		cmd.parseArguments(argv);
 

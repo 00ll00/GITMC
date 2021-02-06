@@ -410,11 +410,9 @@ public class CmdLineParser {
      * Can move forward; can look ahead.
      */
     private class CmdLineImpl extends ArgReader {
-        private int pos;
 
         CmdLineImpl( ArgReader args ) throws CommandSyntaxException {
             super(args);
-            pos = 0;
         }
 
         protected boolean hasMore() {
@@ -422,11 +420,11 @@ public class CmdLineParser {
         }
 
         protected String getCurrentToken() {
-            return readCurrent();
+            return readArg(0);
         }
 
         private void proceed( int n ) {
-            pos += n;
+            skipArg(n);
         }
 
         public String getParameter(int idx) throws CmdLineException {
@@ -492,10 +490,11 @@ public class CmdLineParser {
             String arg = cmdLine.getCurrentToken();
             if( isOption(arg) ) {
                 // '=' is for historical compatibility fallback
-                boolean isKeyValuePair = arg.contains(parserProperties.getOptionValueDelimiter()) || arg.indexOf('=')!=-1;
+//                boolean isKeyValuePair = arg.contains(parserProperties.getOptionValueDelimiter()) || arg.indexOf('=')!=-1;
 
                 // parse this as an option.
-                currentOptionHandler = isKeyValuePair ? findOptionHandler(arg) : findOptionByName(arg);
+//                currentOptionHandler = isKeyValuePair ? findOptionHandler(arg) : findOptionByName(arg);
+                currentOptionHandler = findOptionByName(arg);
 
                 if(currentOptionHandler==null) {
                     // TODO: insert dynamic handler processing
@@ -503,11 +502,12 @@ public class CmdLineParser {
                 }
 
                 // known option; skip its name
-                if (isKeyValuePair) {
-                    cmdLine.splitToken();
-                } else {
-                    cmdLine.proceed(1);
-                }
+//                if (isKeyValuePair) {
+//                    cmdLine.splitToken();
+//                } else {
+//                    cmdLine.proceed(1);
+//                }
+                cmdLine.proceed(1);
             } else {
             	if (argIndex >= arguments.size()) {
             		Messages msg = arguments.size() == 0 ? Messages.NO_ARGUMENT_ALLOWED : Messages.TOO_MANY_ARGUMENTS;

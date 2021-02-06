@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class ArgReader extends StringReader {
 
     public int length;
-    public int relatedPos;
+    public int pos;
     public boolean containHelp;
     public ArrayList<String> args;
     public ArrayList<Integer> argsPos;
@@ -19,7 +19,7 @@ public class ArgReader extends StringReader {
         init();
         if (other instanceof ArgReader) {
             length = ((ArgReader) other).length;
-            relatedPos = ((ArgReader) other).relatedPos;
+            pos = ((ArgReader) other).pos;
         }
     }
 
@@ -47,7 +47,7 @@ public class ArgReader extends StringReader {
                 }
             }
             String arg = builder.toString();
-            if (arg.startsWith("--")) { //$NON-NLS-1$
+//            if (arg.startsWith("--")) { //$NON-NLS-1$
                 final int eq = arg.indexOf('=');
                 if (eq > 0) {
                     args.add(arg.substring(0, eq));
@@ -56,13 +56,13 @@ public class ArgReader extends StringReader {
                     skipWhitespace();
                     continue;
                 }
-            }
+//            }
             args.add(arg);
             skipWhitespace();
         }
         length = args.size();
         containHelp = TextBuiltin.containsHelp(this);
-        relatedPos = 0;
+        pos = 0;
         setCursor(c);
     }
 
@@ -75,7 +75,7 @@ public class ArgReader extends StringReader {
         while (i < length && argsPos.get(i) <= getCursor()) {
             i += 1;
         }
-        return i-1-relatedPos;
+        return i-1-pos;
     }
 
     /**Get argument string at given arg index
@@ -86,7 +86,7 @@ public class ArgReader extends StringReader {
      * @return String
      */
     public String getArg(int index) {
-        index += relatedPos;
+        index += pos;
         if (index < 0 || index >= length) return null;
         return args.get(index);
     }
@@ -99,7 +99,7 @@ public class ArgReader extends StringReader {
      * @return String
      */
     public String readArg(int index) {
-        index += relatedPos;
+        index += pos;
         if (index < 0 || index >= length) return null;
         setCursor(argsPos.get(index));
         return args.get(index);
@@ -112,7 +112,7 @@ public class ArgReader extends StringReader {
      * @return String
      */
     public String getNext() {
-        int i = currentAt() + 1 + relatedPos;
+        int i = currentAt() + 1 + pos;
         if (i>=0 && i<length) {
             return getArg(i);
         }
@@ -126,7 +126,7 @@ public class ArgReader extends StringReader {
      * @return String
      */
     public String readNext() {
-        int i = currentAt() + 1 + relatedPos;
+        int i =currentAt() + 1 + pos;
         if (i>=0 && i<length) {
             return readArg(i);
         }
@@ -140,7 +140,7 @@ public class ArgReader extends StringReader {
      * @return String
      */
     public String readCurrent() {
-        int i = currentAt() + relatedPos;
+        int i = currentAt() + pos;
         if (i>=0 && i<length) {
             return readArg(i);
         }
@@ -154,7 +154,7 @@ public class ArgReader extends StringReader {
      * @return String
      */
     public String getCurrent() {
-        int i = currentAt() + relatedPos;
+        int i = currentAt() + pos;
         if (i>=0 && i<length) {
             return getArg(i);
         }
@@ -162,7 +162,20 @@ public class ArgReader extends StringReader {
     }
 
     public int getLength() {
-        return length - relatedPos;
+        return length;
+    }
+
+    public void skipArg() {
+        skipArg(1);
+    }
+    public void skipArg(int len) {
+        pos += len;
+//        if (pos >= length) {
+//            pos = length-1;
+//        }
+        if (pos < length) {
+            setCursor(argsPos.get(pos));
+        }
     }
 
     /**Set cursor to argument start position
