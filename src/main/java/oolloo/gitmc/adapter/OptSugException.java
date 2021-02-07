@@ -8,17 +8,6 @@ import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.OptionHandler;
 
 public class OptSugException extends SugException{
-    public OptSugException(String message) {
-        super(message);
-    }
-
-    public OptSugException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public OptSugException(Throwable cause) {
-        super(cause);
-    }
 
     public OptSugException(CmdLineParser parser, Localizable message, String... args) {
         super(parser, message, args);
@@ -37,7 +26,7 @@ public class OptSugException extends SugException{
     }
 
     @Override
-    public SuggestionsBuilder suggeste(SuggestionsBuilder builder) {
+    public SuggestionsBuilder suggest(SuggestionsBuilder builder) {
         CmdLineParser parser = getParser();
         builder = builder.createOffset(((ArgReader) parser.cmdLine).getCursor());
         for (OptionHandler o : parser.getOptions()) {

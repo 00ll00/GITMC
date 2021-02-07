@@ -14,12 +14,11 @@ import oolloo.gitmc.adapter.ArgReader;
 import oolloo.gitmc.adapter.SugException;
 import org.eclipse.jgit.pgm.GitHandler;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class GitCLArgument implements ArgumentType<GitHandler> {
-    private final DynamicCommandExceptionType PARSE_FATAL = new DynamicCommandExceptionType((msg) -> new StringTextComponent((String) msg));
+    private final DynamicCommandExceptionType PARSE_FATAL = new DynamicCommandExceptionType((msg) -> new StringTextComponent("fatal: " + (String) msg));
 
     public int help(CommandContext context) {
         try {
@@ -59,7 +58,7 @@ public class GitCLArgument implements ArgumentType<GitHandler> {
                 reader.setCursor(builder.getStart());
                 new GitHandler().parse(new ArgReader(reader));
             } catch (SugException e) {
-                return e.suggeste(builder).buildFuture();
+                return e.suggest(builder).buildFuture();
             } catch (Exception ignore) {
             }
         }

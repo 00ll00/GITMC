@@ -16,16 +16,29 @@ public class ArgReader extends StringReader {
 
     public ArgReader(StringReader other) throws CommandSyntaxException {
         super(other);
-        init();
         if (other instanceof ArgReader) {
             length = ((ArgReader) other).length;
             pos = ((ArgReader) other).pos;
+            containHelp = ((ArgReader) other).containHelp;
+            args = ((ArgReader) other).args;
+            argsPos = ((ArgReader) other).argsPos;
+        } else {
+            init();
         }
     }
 
     public ArgReader(String string) throws CommandSyntaxException {
         super(string);
         init();
+    }
+
+    public ArgReader() {
+        super("");
+        length = 0;
+        pos = 0;
+        containHelp = false;
+        args = new ArrayList<>();
+        argsPos = new ArrayList<>();
     }
 
     private void init() throws CommandSyntaxException {

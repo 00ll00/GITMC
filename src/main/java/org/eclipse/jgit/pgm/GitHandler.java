@@ -26,6 +26,7 @@ import java.util.concurrent.ThreadFactory;
 
 import net.minecraft.command.CommandSource;
 import oolloo.gitmc.adapter.ArgReader;
+import oolloo.gitmc.adapter.ArgReaderHandler;
 import oolloo.gitmc.adapter.Writer;
 import org.eclipse.jgit.awtui.AwtAuthenticator;
 import org.eclipse.jgit.awtui.AwtCredentialsProvider;
@@ -63,8 +64,8 @@ public class GitHandler {
 	@Argument(index = 0, metaVar = "metaVar_command", required = true, handler = SubcommandHandler.class)
 	private TextBuiltin subcommand;
 
-	@Argument(index = 1, metaVar = "metaVar_arg")
-	private List<String> arguments = new ArrayList<>();
+	@Argument(index = 1, metaVar = "metaVar_arg", handler = ArgReaderHandler.class)
+	private ArgReader arguments = new ArgReader();
 
 	Writer writer;
 
@@ -113,7 +114,9 @@ public class GitHandler {
 	 */
 	public void run(CommandSource sourceIn) throws Exception {
 		source = sourceIn;
+		writer = createErrorWriter(source);
 		if (busy) {
+			writer.println("A git command is handling, please wait.");
 			return;
 		}
 		Thread thr = new GitRun();
@@ -130,7 +133,6 @@ public class GitHandler {
 			}
 		}
 		private void gitRun() {
-			writer = createErrorWriter(source);
 			try {
 				//git help
 				if (argv.getLength() == 0 || help) {
@@ -271,14 +273,10 @@ public class GitHandler {
 			subcommand = CommandCatalog.get(cmdId).create();
 		}
 
-
 		cmd = subcommand;
 		init(cmd);
 
-		//TODO:fix subcommand args input
-		argv.pos += 1;
-//		cmd.parseArguments(arguments.toArray(new String[0]));
-		cmd.parseArguments(argv);
+		cmd.parseArguments(arguments);
 
 		return this;
 	}

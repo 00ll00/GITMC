@@ -7,18 +7,6 @@ import org.kohsuke.args4j.Localizable;
 
 public abstract class SugException extends CmdLineException {
 
-    public SugException(String message) {
-        super(message);
-    }
-
-    public SugException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public SugException(Throwable cause) {
-        super(cause);
-    }
-
     public SugException(CmdLineParser parser, Localizable message, String... args) {
         super(parser, message, args);
     }
@@ -35,5 +23,5 @@ public abstract class SugException extends CmdLineException {
         super(parser, cause);
     }
 
-    public abstract SuggestionsBuilder suggeste (SuggestionsBuilder builder);
+    public abstract SuggestionsBuilder suggest(SuggestionsBuilder builder);
 }

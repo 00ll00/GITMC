@@ -7,17 +7,6 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Localizable;
 
 public class SubCmdSugException extends SugException{
-    public SubCmdSugException(String message) {
-        super(message);
-    }
-
-    public SubCmdSugException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public SubCmdSugException(Throwable cause) {
-        super(cause);
-    }
 
     public SubCmdSugException(CmdLineParser parser, Localizable message, String... args) {
         super(parser, message, args);
@@ -36,7 +25,7 @@ public class SubCmdSugException extends SugException{
     }
 
     @Override
-    public SuggestionsBuilder suggeste(SuggestionsBuilder builder) {
+    public SuggestionsBuilder suggest(SuggestionsBuilder builder) {
         builder = builder.createOffset (((ArgReader) getParser().cmdLine).getCursor());
         for (CommandRef cr : CommandCatalog.all()) {
             builder.suggest(cr.getName());

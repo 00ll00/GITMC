@@ -26,10 +26,12 @@ public class Writer extends java.io.Writer {
     }
 
     public Writer append (String str) {
+        str = str.replace("\t","    ");
         buffer.func_230529_a_(new StringTextComponent(str).func_230530_a_(defaultStyle));
         return this;
     }
     public Writer append (String str, Style style) {
+        str = str.replace("\t","    ");
         buffer.func_230529_a_(new StringTextComponent(str).func_230530_a_(style));
         return this;
     }
