@@ -75,6 +75,7 @@ public class GitHandler {
 	private TextBuiltin cmd;
 	private ArgReader argv;
 	private CommandSource source;
+	private static String defaultGitDir;
 	private static boolean busy = false;
 
 	/**
@@ -301,7 +302,7 @@ public class GitHandler {
 	 */
 	protected Repository openGitDir(String aGitdir) throws IOException {
 		RepositoryBuilder rb = new RepositoryBuilder() //
-				.setGitDir(aGitdir != null ? new File(aGitdir) : null) //
+				.setGitDir(aGitdir != null ? new File(aGitdir) : (defaultGitDir != null ? new File(defaultGitDir) : null)) //
 				.readEnvironment() //
 				.findGitDir();
 		if (rb.getGitDir() == null)
@@ -397,6 +398,10 @@ public class GitHandler {
 	public void help(CommandSource source) throws Exception {
 		parse(new ArgReader(""));
 		run(source);
+	}
+
+	public static void setDefaultGitDir(String gitDirIn) {
+		defaultGitDir = gitDirIn;
 	}
 
 	/**

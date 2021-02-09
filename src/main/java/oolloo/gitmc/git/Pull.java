@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-package org.eclipse.jgit.pgm;
+package oolloo.gitmc.git;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
@@ -17,6 +17,8 @@ import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.*;
+import org.eclipse.jgit.pgm.Command;
+import org.eclipse.jgit.pgm.TextBuiltin;
 import org.eclipse.jgit.pgm.internal.CLIText;
 import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.transport.RemoteRefUpdate.Status;
@@ -73,7 +75,7 @@ class Pull extends TextBuiltin {
 //	@Option(name = "--push-option", aliases = { "-t" })
 //	private List<String> pushOptions = new ArrayList<>();
 
-	private boolean shownURI;
+//	private boolean shownURI;
 
 	/** {@inheritDoc} */
 	@Override
@@ -82,7 +84,7 @@ class Pull extends TextBuiltin {
 			PullCommand pull = git.pull();
 //			pull.setDryRun(dryRun);
 //			pull.setForce(force);
-			pull.setProgressMonitor(new TextProgressMonitor(errw));
+//			pull.setProgressMonitor(new TextProgressMonitor(errw));
 //			pull.setReceivePack(receivePack);
 //			pull.setRefSpecs(refSpecs);
 //			if (all) {

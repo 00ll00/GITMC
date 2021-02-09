@@ -4,12 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -18,12 +14,11 @@ import java.util.Set;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import oolloo.gitmc.adapter.ArgReader;
-import oolloo.gitmc.adapter.OptSugException;
+import oolloo.gitmc.adapter.OptNameSugException;
 import oolloo.gitmc.adapter.Writer;
 import org.kohsuke.args4j.spi.Getter;
 
 import org.kohsuke.args4j.spi.OptionHandler;
-import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 
 import static org.kohsuke.args4j.Utilities.checkNonNull;
@@ -498,7 +493,7 @@ public class CmdLineParser {
 
                 if(currentOptionHandler==null) {
                     // TODO: insert dynamic handler processing
-                    throw new OptSugException(this, Messages.UNDEFINED_OPTION, arg);
+                    throw new OptNameSugException(this, Messages.UNDEFINED_OPTION, arg);
                 }
 
                 // known option; skip its name
